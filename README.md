@@ -4,7 +4,6 @@
 
 ## 功能
 - 使用纯 HTML、CSS 和 JavaScript 构建的单页 UI。
-- 深色/浅色主题切换。
 - 使用 `localStorage` 进行本地持久化（未来扩展中可使用 IndexedDB）。
 - 通过 `contenteditable` 区域提供基础富文本编辑（粗体、斜体、列表、标题）。
 - 可选的标签支持，用于对笔记进行分组（可在后续启用）。
