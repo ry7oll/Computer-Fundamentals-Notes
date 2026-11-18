@@ -1,19 +1,1588 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HTML 笔记</title>
-    <link rel="stylesheet" href="assets/css/style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ry7oll/Computer-Fundamentals-Notes · 数字逻辑与开关理论课堂笔记</title>
+  <style>
+    /* =========================================================
+       GitHub Dark Default (默认，对齐截图) & Light 主题变量
+       ========================================================= */
+    :root, [data-theme="dark"] {
+      --bg: #0d1117;
+      --bg-subtle: #161b22;
+      --bg-inset: #010409;
+      --bg-hover: #21262d;
+      --border: #30363d;
+      --border-muted: #21262d;
+      --fg: #e6edf3;
+      --fg-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-emphasis: #1f6feb;
+      --accent-subtle: rgba(56, 139, 253, 0.15);
+      --success: #3fb950;
+      --success-emphasis: #238636;
+      --success-subtle: rgba(46, 160, 67, 0.15);
+      --danger: #f85149;
+      --danger-subtle: rgba(248, 81, 73, 0.15);
+      --attention: #d29922;
+      --attention-subtle: rgba(187, 128, 9, 0.15);
+      --done: #a371f7;
+      --done-subtle: rgba(163, 113, 247, 0.15);
+      --tab-active: #f78166;
+      --shadow: 0 16px 48px rgba(1, 4, 9, 0.85);
+      --radius: 6px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", "PingFang SC", "Microsoft YaHei", Helvetica, Arial, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+    [data-theme="light"] {
+      --bg: #ffffff;
+      --bg-subtle: #f6f8fa;
+      --bg-inset: #f6f8fa;
+      --bg-hover: #eaeef2;
+      --border: #d0d7de;
+      --border-muted: #d8dee4;
+      --fg: #1f2328;
+      --fg-muted: #656d76;
+      --accent: #0969da;
+      --accent-emphasis: #0969da;
+      --accent-subtle: #ddf4ff;
+      --success: #1a7f37;
+      --success-emphasis: #1f883d;
+      --success-subtle: #dafbe1;
+      --danger: #d1242f;
+      --danger-subtle: #ffebe9;
+      --attention: #9a6700;
+      --attention-subtle: #fff8c5;
+      --done: #8250df;
+      --done-subtle: #fbefff;
+      --tab-active: #fd8c73;
+      --shadow: 0 16px 48px rgba(31, 35, 40, 0.25);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-padding-top: 20px; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--fg);
+      background: var(--bg);
+      overflow-x: hidden;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button { font-family: inherit; color: inherit; }
+    code, kbd, pre { font-family: var(--mono); }
+    .muted { color: var(--fg-muted); }
+    .spacer { flex: 1; }
+    .ic { width: 16px; height: 16px; flex: none; vertical-align: text-bottom; }
+    .ov { text-decoration: overline; }
+
+    /* ---------- 页面主容器（侧边栏弹出时虚化暗淡） ---------- */
+    .page-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: filter 0.25s ease, opacity 0.25s ease;
+    }
+    body.drawer-open .page-wrap {
+      filter: blur(3px) brightness(0.55);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ---------- 顶部全局 Header（对齐 GitHub 截图） ---------- */
+    .gh-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px;
+      background: var(--bg-inset);
+      border-bottom: 1px solid var(--border);
+    }
+    .menu-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--fg-muted);
+      cursor: pointer;
+      transition: 0.15s;
+      flex: none;
+    }
+    .menu-btn:hover { color: var(--fg); border-color: var(--fg-muted); background: var(--bg-hover); }
+    .gh-logo { color: var(--fg); display: flex; flex: none; }
+    .gh-context { display: flex; align-items: center; gap: 6px; font-size: 14px; white-space: nowrap; overflow: hidden; }
+    .gh-context a { color: var(--fg); font-weight: 600; }
+    .gh-context a:hover { color: var(--accent); }
+    .gh-context .sep { color: var(--fg-muted); }
+
+    .gh-search { position: relative; margin-left: auto; width: 320px; max-width: 42vw; }
+    .gh-search input {
+      width: 100%;
+      padding: 5px 32px 5px 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 13px;
+      outline: none;
+      transition: 0.15s;
+    }
+    .gh-search input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-subtle); }
+    .gh-search kbd {
+      position: absolute; right: 8px; top: 5px;
+      font-size: 11px; border: 1px solid var(--border);
+      color: var(--fg-muted); border-radius: 4px; padding: 0 5px; pointer-events: none;
+    }
+    .search-pop {
+      position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+      background: var(--bg-subtle); color: var(--fg);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow); z-index: 60; max-height: 420px; overflow: auto;
+    }
+    .search-pop a { display: block; padding: 8px 12px; color: var(--fg); border-bottom: 1px solid var(--border-muted); }
+    .search-pop a:last-child { border-bottom: 0; }
+    .search-pop a:hover, .search-pop a.on { background: var(--accent-emphasis); color: #fff; text-decoration: none; }
+    .search-pop a:hover .muted, .search-pop a.on .muted { color: #e6edf3; }
+    .search-pop .s-title { font-weight: 600; }
+    .search-pop .s-snip { font-size: 12px; }
+    .search-pop mark { background: var(--attention-subtle); color: var(--attention); border-radius: 2px; padding: 0 2px; }
+    .search-pop .empty { padding: 12px; }
+
+    /* ---------- 仓库标题栏 + 导航 Tabs ---------- */
+    .repo-head {
+      background: var(--bg-inset);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px 0;
+    }
+    .repo-top {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .repo-title { display: flex; align-items: center; gap: 6px; font-size: 18px; color: var(--fg-muted); }
+    .repo-title a { color: var(--accent); }
+    .label-pill { font-size: 12px; font-weight: 500; border: 1px solid var(--border); border-radius: 2em; padding: 0 8px; color: var(--fg-muted); }
+    .repo-nav {
+      max-width: 1280px;
+      margin: 12px auto 0;
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+    }
+    .repo-nav a {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px 12px;
+      color: var(--fg);
+      white-space: nowrap;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .repo-nav a:hover { text-decoration: none; background: var(--bg-hover); }
+    .repo-nav a.active { font-weight: 600; }
+    .repo-nav a.active::after {
+      content: ""; position: absolute; left: 8px; right: 8px; bottom: 0;
+      height: 2px; background: var(--tab-active); border-radius: 2px;
+    }
+    .counter {
+      display: inline-block; min-width: 20px; padding: 0 6px;
+      font-size: 12px; font-weight: 500; line-height: 18px; text-align: center;
+      background: rgba(110, 118, 129, 0.35); border-radius: 2em; color: var(--fg);
+    }
+
+    /* ---------- 弹出式侧边导航抽屉（高亮对比 + 背景虚化） ---------- */
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(1, 4, 9, 0.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 90;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    body.drawer-open .backdrop { opacity: 1; pointer-events: auto; }
+
+    .drawer {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 340px;
+      max-width: 88vw;
+      background: var(--bg-subtle);
+      border-right: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(-100%);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    body.drawer-open .drawer { transform: translateX(0); }
+
+    .drawer-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .drawer-head b { font-size: 14px; }
+    .drawer-close {
+      margin-left: auto;
+      width: 28px; height: 28px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--bg-hover); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--fg-muted); cursor: pointer;
+    }
+    .drawer-close:hover { color: var(--fg); border-color: var(--fg-muted); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 12px 10px 24px; }
+    .drawer-prog { padding: 0 8px 12px; border-bottom: 1px solid var(--border-muted); margin-bottom: 10px; }
+
+    .tree { display: flex; flex-direction: column; gap: 2px; }
+    .tree-item, .tree-row {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 8px; border-radius: var(--radius);
+      color: var(--fg); cursor: pointer; user-select: none; position: relative; font-size: 13px;
+    }
+    .tree-item:hover, .tree-row:hover { background: var(--bg-hover); text-decoration: none; }
+    .tree-item.active, .tree-row.active { background: var(--accent-subtle); color: var(--accent); font-weight: 600; }
+    .tree-item.active::before, .tree-row.active::before {
+      content: ""; position: absolute; left: -6px; top: 4px; bottom: 4px;
+      width: 3px; border-radius: 3px; background: var(--accent);
+    }
+    .tree-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+    .tree-children { display: none; padding-left: 16px; }
+    .tree-folder.open > .tree-children { display: block; }
+    .caret { width: 16px; height: 16px; flex: none; color: var(--fg-muted); transition: transform 0.15s; border-radius: 4px; }
+    .caret:hover { background: var(--border); }
+    .tree-folder.open > .tree-row > .caret { transform: rotate(90deg); }
+    .tree-badge { font-size: 11px; padding: 0 6px; border-radius: 2em; flex: none; }
+    .tree-badge.ok { background: var(--success-subtle); color: var(--success); }
+    .tree-badge.ing { background: var(--attention-subtle); color: var(--attention); }
+    .tree-sublist { padding-left: 14px; border-left: 1px solid var(--border); margin: 2px 0 4px 10px; }
+    .tree-sub { display: block; padding: 3px 8px; font-size: 12px; color: var(--fg-muted); border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tree-sub:hover { color: var(--fg); background: var(--bg-hover); text-decoration: none; }
+
+    /* ---------- 主内容区（宽屏全比例舒展，不再挤在中间） ---------- */
+    .main {
+      flex: 1;
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px 32px 64px;
+    }
+
+    /* ---------- 通用盒子 / 按钮 / 进度条 ---------- */
+    .box { border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); margin-bottom: 16px; overflow: hidden; }
+    .box-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 16px; background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border); flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; font-size: 13px; font-weight: 500; line-height: 20px;
+      color: var(--fg); background: var(--bg-hover);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      cursor: pointer; transition: 0.15s; white-space: nowrap;
+    }
+    .btn:hover { background: var(--border); text-decoration: none; }
+    .btn-primary { color: #fff; background: var(--success-emphasis); border-color: rgba(240, 246, 252, 0.1); }
+    .btn-primary:hover { background: #2ea043; }
+    .btn-sm { padding: 3px 10px; font-size: 12px; }
+    .btn-danger { color: var(--danger); }
+    .btn-danger:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+    .input {
+      padding: 6px 12px; font-size: 14px;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      outline: none; background: var(--bg-inset); color: var(--fg);
+    }
+    .input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-subtle); }
+    .avatar {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px; border-radius: 50%;
+      color: #fff; font-size: 11px; font-weight: 600; flex: none;
+    }
+    .avatar.lg { width: 32px; height: 32px; font-size: 14px; }
+    .label { display: inline-block; padding: 0 8px; font-size: 12px; font-weight: 500; line-height: 18px; border-radius: 2em; border: 1px solid transparent; white-space: nowrap; }
+    .progress { height: 8px; background: var(--bg-hover); border-radius: 6px; overflow: hidden; }
+    .progress > span { display: block; height: 100%; background: var(--success); border-radius: 6px; transition: width 0.4s ease; }
+
+    /* ---------- 首页 ---------- */
+    .home-grid { display: grid; grid-template-columns: minmax(0, 1fr) 296px; gap: 24px; }
+    .toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+    .toolbar .stat { display: inline-flex; align-items: center; gap: 4px; color: var(--fg-muted); }
+    .toolbar .stat b { color: var(--fg); }
+    .file-row { display: flex; align-items: center; gap: 12px; padding: 9px 16px; border-top: 1px solid var(--border-muted); }
+    .file-row:first-of-type { border-top: 0; }
+    .file-row:hover { background: var(--bg-subtle); }
+    .file-row .fname { width: 280px; flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-row .fname a { color: var(--fg); }
+    .file-row .fname a:hover { color: var(--accent); }
+    .file-row .fmsg { flex: 1; color: var(--fg-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-row .fdate { color: var(--fg-muted); white-space: nowrap; font-size: 12px; }
+    .side-block { padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--border-muted); }
+    .side-block:last-child { border-bottom: 0; }
+    .side-block h3 { font-size: 15px; margin: 0 0 10px; }
+    .topics { display: flex; flex-wrap: wrap; gap: 6px; }
+    .topic { background: var(--accent-subtle); color: var(--accent); font-size: 12px; font-weight: 500; padding: 0 10px; line-height: 22px; border-radius: 2em; }
+    .topic:hover { background: var(--accent-emphasis); color: #fff; text-decoration: none; }
+    .contrib { display: flex; flex-wrap: wrap; gap: 10px; }
+    .contrib a { display: flex; align-items: center; gap: 6px; color: var(--fg); }
+
+    /* ---------- 章节页（包含本节快速跳转目录 + 正文） ---------- */
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 15px; margin-bottom: 14px; flex-wrap: wrap; }
+    .seg { display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .seg a { padding: 4px 14px; color: var(--fg); font-weight: 500; display: inline-flex; gap: 6px; align-items: center; }
+    .seg a + a { border-left: 1px solid var(--border); }
+    .seg a:hover { background: var(--bg-hover); text-decoration: none; }
+    .seg a.on { background: var(--bg); box-shadow: inset 0 -2px 0 var(--tab-active); }
+
+    .sec-pills { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 16px; background: var(--bg-inset); border-bottom: 1px solid var(--border); }
+    .sec-pills a {
+      font-size: 12px; padding: 3px 10px; border-radius: 2em;
+      border: 1px solid var(--border); color: var(--fg-muted); background: var(--bg-subtle);
+    }
+    .sec-pills a:hover, .sec-pills a.on { border-color: var(--accent); color: var(--accent); background: var(--accent-subtle); text-decoration: none; }
+
+    .pager { display: flex; justify-content: space-between; gap: 16px; margin-top: 12px; }
+    .pager a { flex: 1; max-width: 48%; border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; color: var(--fg); background: var(--bg-subtle); }
+    .pager a:hover { border-color: var(--accent); text-decoration: none; }
+    .pager a.next { text-align: right; margin-left: auto; }
+    .pager small { display: block; color: var(--fg-muted); }
+
+    /* ---------- Markdown 正文排版（统一风格） ---------- */
+    .markdown-body { padding: 28px 36px 36px; font-size: 15px; line-height: 1.75; word-wrap: break-word; }
+    .markdown-body h1 { font-size: 1.9em; padding-bottom: 0.3em; border-bottom: 1px solid var(--border-muted); margin: 0 0 16px; line-height: 1.3; }
+    .markdown-body h2 { font-size: 1.45em; padding-bottom: 0.3em; border-bottom: 1px solid var(--border-muted); margin: 36px 0 16px; line-height: 1.3; position: relative; }
+    .markdown-body h3 { font-size: 1.15em; margin: 22px 0 10px; color: var(--accent); }
+    .markdown-body p, .markdown-body ul, .markdown-body ol, .markdown-body table, .markdown-body blockquote { margin: 0 0 14px; }
+    .markdown-body ul, .markdown-body ol { padding-left: 1.8em; }
+    .markdown-body li + li { margin-top: 0.25em; }
+    .markdown-body code { padding: 0.15em 0.4em; font-size: 88%; background: rgba(110, 118, 129, 0.25); border-radius: 5px; }
+    .markdown-body pre { padding: 14px 16px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius); overflow: auto; font-size: 13px; line-height: 1.5; }
+    .markdown-body pre code { background: none; padding: 0; }
+    .markdown-body table { border-collapse: collapse; width: 100%; max-width: 100%; overflow: auto; margin-bottom: 16px; }
+    .markdown-body th, .markdown-body td { padding: 7px 12px; border: 1px solid var(--border); text-align: left; }
+    .markdown-body th { font-weight: 600; background: var(--bg-subtle); }
+    .markdown-body tr:nth-child(2n) td { background: rgba(110, 118, 129, 0.05); }
+    .markdown-body .lead { font-size: 1.05em; color: var(--fg-muted); }
+    .sub-block { padding: 12px 16px; border: 1px solid var(--border-muted); border-radius: var(--radius); margin-bottom: 14px; background: rgba(110, 118, 129, 0.04); }
+    .sub-block h3 { margin-top: 0; }
+    .note-sec { scroll-margin-top: 20px; }
+    .note-sec.flash { animation: flash 1.6s ease; }
+
+    /* 提示框 */
+    .callout { border-left: 4px solid var(--accent); background: var(--accent-subtle); padding: 10px 16px; border-radius: 0 var(--radius) var(--radius) 0; margin: 0 0 16px; }
+    .callout.tip { border-color: var(--success); background: var(--success-subtle); }
+    .callout.warn { border-color: var(--attention); background: var(--attention-subtle); }
+    .callout.key { border-color: var(--done); background: var(--done-subtle); }
+    .callout b:first-child { display: block; margin-bottom: 2px; }
+
+    /* ======== 交互组件 ======== */
+    .term { color: var(--accent); border-bottom: 1px dashed var(--accent); cursor: help; position: relative; outline: none; }
+    .term::after {
+      content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 8px);
+      transform: translate(-50%, 4px); width: max-content; max-width: 280px;
+      padding: 6px 10px; font-size: 12px; line-height: 1.5; font-weight: 400;
+      color: #fff; background: #1f2328; border: 1px solid var(--border);
+      border-radius: var(--radius); white-space: normal; opacity: 0; pointer-events: none;
+      transition: 0.15s ease; z-index: 30; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    .term:hover::after, .term:focus::after, .term.show::after { opacity: 1; transform: translate(-50%, 0); }
+
+    details.fold { border: 1px solid var(--border); border-radius: var(--radius); margin: 0 0 12px; background: var(--bg-subtle); overflow: hidden; }
+    details.fold > summary { cursor: pointer; padding: 9px 14px; font-weight: 600; list-style: none; display: flex; align-items: center; gap: 8px; user-select: none; }
+    details.fold > summary::-webkit-details-marker { display: none; }
+    details.fold > summary::before { content: "▸"; color: var(--fg-muted); transition: transform 0.2s; }
+    details.fold[open] > summary::before { transform: rotate(90deg); }
+    details.fold[open] > summary { border-bottom: 1px solid var(--border); }
+    details.fold > .fold-body { padding: 12px 16px 4px; background: var(--bg); animation: fadeDown 0.2s ease; }
+
+    .tabs { border: 1px solid var(--border); border-radius: var(--radius); margin: 0 0 16px; overflow: hidden; }
+    .tab-bar { display: flex; background: var(--bg-subtle); border-bottom: 1px solid var(--border); overflow-x: auto; }
+    .tab-bar button { padding: 8px 16px; border: 0; background: transparent; cursor: pointer; font-size: 13px; color: var(--fg-muted); white-space: nowrap; border-bottom: 2px solid transparent; transition: 0.15s; }
+    .tab-bar button:hover { color: var(--fg); background: var(--bg-hover); }
+    .tab-bar button.on { color: var(--fg); font-weight: 600; border-bottom-color: var(--tab-active); background: var(--bg); }
+    .tab-pane { padding: 14px 16px 4px; animation: fadeIn 0.2s ease; }
+
+    .picker { margin: 0 0 16px; }
+    .pick-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+    .pick { padding: 7px 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-subtle); cursor: pointer; font-size: 13px; transition: 0.15s; }
+    .pick:hover { border-color: var(--accent); color: var(--accent); }
+    .pick.on { background: var(--accent-emphasis); border-color: var(--accent); color: #fff; }
+    .picker-out { min-height: 46px; padding: 12px 16px; border: 1px dashed var(--border); border-radius: var(--radius); background: var(--bg-subtle); }
+    .picker-out.pop { animation: pop 0.25s ease; border-style: solid; border-color: var(--accent); background: var(--accent-subtle); }
+
+    ol.steps li { transition: opacity 0.25s, transform 0.25s; }
+    ol.steps li.step-hidden { opacity: 0; height: 0; overflow: hidden; margin: 0; }
+    .steps-btn { margin: -6px 0 14px; }
+
+    /* 专属交互组件：逻辑门模拟器 / 进制转换器 / 卡诺图 */
+    .widget { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin: 0 0 16px; background: var(--bg-subtle); }
+    .widget-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+    .bit-btn { min-width: 72px; font-family: var(--mono); font-weight: 600; }
+    .bit-btn.hi { background: var(--success-emphasis); border-color: var(--success); color: #fff; }
+    .kmap { display: inline-grid; grid-template-columns: auto repeat(4, 52px); gap: 2px; font-family: var(--mono); text-align: center; margin-bottom: 10px; }
+    .kmap .kh { padding: 6px; font-size: 12px; color: var(--fg-muted); }
+    .kmap .kc { padding: 10px 0; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); cursor: pointer; font-weight: 600; transition: 0.15s; }
+    .kmap .kc.v1 { background: var(--accent-subtle); border-color: var(--accent); color: var(--accent); }
+    .kmap .kc.vx { background: var(--attention-subtle); border-color: var(--attention); color: var(--attention); }
+
+    /* ======== 练习系统 ======== */
+    .quiz-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--border-muted); padding-bottom: 12px; margin-bottom: 18px; }
+    .quiz-head h1 { border: 0; margin: 0; padding: 0; flex: 1; }
+    .quiz-score { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--fg-muted); min-width: 220px; }
+    .quiz-score .progress { flex: 1; min-width: 100px; }
+    .qcard { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; background: var(--bg-subtle); transition: 0.2s; scroll-margin-top: 20px; }
+    .qcard.ok { border-color: var(--success); box-shadow: 0 0 0 2px var(--success-subtle); }
+    .qcard.bad { border-color: var(--danger); box-shadow: 0 0 0 2px var(--danger-subtle); }
+    .qtitle { font-weight: 600; margin-bottom: 12px; font-size: 15px; }
+    .qno { display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center; border-radius: 50%; background: var(--fg); color: var(--bg); font-size: 12px; margin-right: 6px; }
+    .qtype { font-size: 12px; font-weight: 500; color: var(--accent); background: var(--accent-subtle); border-radius: 2em; padding: 1px 8px; margin-right: 6px; }
+    .qopts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .qopt { display: flex; align-items: center; gap: 10px; text-align: left; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); cursor: pointer; font-size: 14px; transition: 0.15s; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-subtle); }
+    .qopt:disabled { cursor: default; }
+    .qkey { display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center; border-radius: 4px; background: var(--bg-hover); font-size: 12px; font-weight: 600; flex: none; }
+    .qopt.right { border-color: var(--success); background: var(--success-subtle); }
+    .qopt.right .qkey { background: var(--success-emphasis); color: #fff; }
+    .qopt.wrong { border-color: var(--danger); background: var(--danger-subtle); animation: shake 0.35s; }
+    .qopt.wrong .qkey { background: var(--danger); color: #fff; }
+    .qfill { display: flex; gap: 8px; flex-wrap: wrap; }
+    .qfill .input { flex: 1; min-width: 180px; }
+    .qresult { margin-top: 12px; padding: 10px 14px; border-radius: var(--radius); font-size: 14px; animation: fadeDown 0.2s ease; }
+    .qresult.ok { background: var(--success-subtle); color: var(--success); }
+    .qresult.bad { background: var(--danger-subtle); color: var(--danger); }
+    .qresult .exp { color: var(--fg); margin-top: 6px; }
+    details.qpeek { margin-top: 10px; font-size: 13px; color: var(--fg-muted); }
+    details.qpeek summary { cursor: pointer; }
+    .celebrate { text-align: center; padding: 14px; border-radius: var(--radius); background: var(--success-subtle); color: var(--success); font-weight: 600; margin-bottom: 16px; }
+
+    /* ======== 列表页（练习总览 / 分工 / Actions） ======== */
+    .list-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .list-head .ftab { display: inline-flex; align-items: center; gap: 6px; color: var(--fg-muted); cursor: pointer; background: none; border: 0; font-size: 14px; padding: 0; }
+    .list-head .ftab:hover, .list-head .ftab.on { color: var(--fg); font-weight: 600; }
+    .list-row { display: flex; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--border-muted); align-items: flex-start; }
+    .list-row:first-of-type { border-top: 0; }
+    .list-row:hover { background: var(--bg-subtle); }
+    .list-row .lr-main { flex: 1; min-width: 0; }
+    .list-row .lr-title { font-weight: 600; color: var(--fg); font-size: 15px; }
+    .list-row .lr-title:hover { color: var(--accent); }
+    .list-row .lr-meta { font-size: 12px; color: var(--fg-muted); margin-top: 3px; }
+    .list-row details { margin-top: 6px; }
+    .list-row details summary { cursor: pointer; color: var(--accent); font-size: 13px; }
+    .page-title { display: flex; align-items: center; gap: 12px; margin: 0 0 16px; flex-wrap: wrap; }
+    .page-title h1 { font-size: 22px; margin: 0; font-weight: 600; }
+    .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .stat-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; background: var(--bg-subtle); }
+    .stat-card .num { font-size: 26px; font-weight: 600; }
+    .stat-card .lbl { color: var(--fg-muted); font-size: 12px; }
+    .run-steps { list-style: none; padding: 6px 0 0; margin: 0; }
+    .run-steps li { display: flex; gap: 8px; align-items: center; padding: 4px 0; font-size: 13px; }
+    .run-steps li a { color: var(--fg); }
+
+    .gh-footer { border-top: 1px solid var(--border); padding: 20px 24px; text-align: center; color: var(--fg-muted); font-size: 12px; margin-top: auto; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    @keyframes pop { 0% { transform: scale(0.98); } 100% { transform: scale(1); } }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+    @keyframes flash { 0% { background: var(--attention-subtle); } 100% { background: transparent; } }
+
+    @media (max-width: 960px) {
+      .home-grid { grid-template-columns: 1fr; }
+      .file-row .fmsg { display: none; }
+    }
+    @media (max-width: 720px) {
+      .gh-header { padding: 10px 14px; }
+      .gh-context { display: none; }
+      .gh-search { max-width: none; flex: 1; }
+      .gh-search kbd { display: none; }
+      .repo-head { padding: 10px 14px 0; }
+      .main { padding: 16px 14px 48px; }
+      .markdown-body { padding: 18px 16px; }
+      .qopts { grid-template-columns: 1fr; }
+      .file-row .fname { width: auto; flex: 1; }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>HTML 笔记</h1>
-        <button id="themeToggle">切换主题</button>
+  <!-- 弹出式侧边导航（点击左上角按钮弹出，背景虚化暗淡） -->
+  <div class="backdrop" id="backdrop"></div>
+  <aside class="drawer" id="drawer" aria-label="课程目录导航">
+    <div class="drawer-head">
+      <svg viewBox="0 0 16 16" width="24" height="24" fill="currentColor"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>
+      <b>课程章节目录</b>
+      <button class="drawer-close" id="drawerClose" type="button" aria-label="关闭目录">✕</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+
+  <!-- 主页面容器（侧边栏打开时整体虚化暗淡） -->
+  <div class="page-wrap" id="pageWrap">
+    <header class="gh-header">
+      <button class="menu-btn" id="menuBtn" type="button" title="打开章节目录" aria-label="打开章节目录">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M1 2.75A.75.75 0 0 1 1.75 2h12.5a.75.75 0 0 1 0 1.5H1.75A.75.75 0 0 1 1 2.75Zm0 5A.75.75 0 0 1 1.75 7h12.5a.75.75 0 0 1 0 1.5H1.75A.75.75 0 0 1 1 7.75ZM1.75 12h12.5a.75.75 0 0 1 0 1.5H1.75a.75.75 0 0 1 0-1.5Z"/></svg>
+      </button>
+      <a class="gh-logo" href="#/" aria-label="首页">
+        <svg viewBox="0 0 16 16" width="28" height="28" fill="currentColor"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>
+      </a>
+      <div class="gh-context"><a href="#/">ry7oll</a><span class="sep">/</span><a href="#/">Computer-Fundamentals-Notes</a></div>
+      <div class="gh-search">
+        <input id="searchInput" type="search" placeholder="搜索知识点…" autocomplete="off" />
+        <kbd>/</kbd>
+        <div class="search-pop" id="searchPop" hidden></div>
+      </div>
+      <button class="btn btn-sm" id="themeBtn" type="button" title="切换深色/浅色主题">🌙</button>
     </header>
-    <main id="appRoot">
-        <!-- 内容由 app.js 渲染 -->
-    </main>
-    <script type="module" src="assets/js/app.js"></script>
+
+    <div class="repo-head">
+      <div class="repo-top">
+        <div class="repo-title">
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/></svg>
+          <a href="#/">ry7oll</a><span>/</span><a href="#/"><b>Computer-Fundamentals-Notes</b></a>
+          <span class="label-pill">课堂笔记</span>
+        </div>
+      </div>
+      <nav class="repo-nav" id="repoNav">
+        <a data-view="code" href="#/">📖 章节</a>
+        <a data-view="quiz" href="#/quiz">✏️ 练习 <span class="counter" id="quizCounter"></span></a>
+        <a data-view="team" href="#/team">👥 分工</a>
+        <a data-view="actions" href="#/actions">▶️ Actions</a>
+      </nav>
+    </div>
+
+    <main class="main" id="main"></main>
+
+    <footer class="gh-footer">
+      © 2026 Computer-Fundamentals-Notes · 《数字逻辑 / 开关理论》课堂笔记小组（点击左上角 ☰ 打开目录）
+    </footer>
+  </div>
+
+<script>
+/* =========================================================
+   1. 小组分工数据（4 人分工，可根据需要修改成员名称）
+   ========================================================= */
+const TEAM = [
+  {
+    name: 'ry7oll',
+    role: '组长 · 第1章 开关理论基础 + 页面框架',
+    color: '#1f6feb',
+    tasks: [
+      '搭建仿 GitHub 网页风格的单文件 HTML 框架（抽屉目录、背景虚化、搜索与路由）',
+      '编写第1章《开关理论基础》（1.1~1.6 全部小节）',
+      '制作进制转换器、基本逻辑门模拟器、卡诺图交互组件',
+      '汇总合并各章节内容与最终校对'
+    ]
+  },
+  {
+    name: 'NiLuo',
+    role: '第2章 组合逻辑 + 练习系统测试',
+    color: '#8250df',
+    tasks: [
+      '编写第2章《组合逻辑》（2.1~2.7 全部小节）',
+      '整理组合逻辑分析/设计例题与典型练习题',
+      '测试单选题与填空题的即时判断和解析显示'
+    ]
+  },
+  {
+    name: '成员C',
+    role: '第3章 时序逻辑 + 视觉样式统一',
+    color: '#bf3989',
+    tasks: [
+      '编写第3章《时序逻辑》（3.1~3.7 全部小节）',
+      '制作锁存器 / 触发器状态交互卡片',
+      '统一深色/浅色主题配色与排版规范'
+    ]
+  },
+  {
+    name: '成员D',
+    role: '题库校对 + Actions 学习进度页',
+    color: '#238636',
+    tasks: [
+      '编写各章课后典型练习题与详细解析',
+      '设计「Actions · 学习进度」汇总页',
+      '全书公式、真值表与术语校对'
+    ]
+  }
+];
+
+/* =========================================================
+   2. 课程章节数据（完全按大纲生成 第1章 ~ 第3章）
+   ========================================================= */
+const CHAPTERS = [
+  /* -------------------- 第1章 开关理论基础 -------------------- */
+  {
+    id: 1,
+    title: '开关理论基础',
+    author: 'ry7oll',
+    updated: '2026-11-18',
+    summary: '二进制系统、数制码制、逻辑函数、布尔代数、卡诺图与数字集成电路',
+    intro: '本章从连续量与离散量的区别出发，建立二进制开关理论基础，学习数制码制、逻辑函数描述工具、布尔代数化简、卡诺图化简及数字集成电路基础。',
+    sections: [
+      {
+        title: '1.1 二进制系统',
+        subs: [
+          {
+            title: '1.1.1 连续量和离散量',
+            html: `
+              <p>自然界中的物理量按变化方式分为两类：</p>
+              <ul>
+                <li><b>连续量（模拟量）</b>：在时间和数值上连续变化，可取无限多个值（如温度、电压、声音波形）。</li>
+                <li><b>离散量（数字量）</b>：在时间上或数值上不连续，只能取有限个离散值（如计数人数、二进制比特 <code>0</code> 和 <code>1</code>）。</li>
+              </ul>
+              <div class="callout"><b>为什么使用数字系统？</b>抗干扰能力强、易于存储与加密、可用统一电路大规模集成处理。</div>`
+          },
+          {
+            title: '1.1.2 开关量',
+            html: `
+              <p><span class="term" data-tip="只有两种互斥状态（如开/关、高电平/低电平、真/假）的离散量">开关量</span>是只有两个取值的最简单离散量，通常记为 <code>0</code> 和 <code>1</code>（并不代表数值大小，而是两种逻辑状态）。</p>
+              <div class="picker">
+                <div class="pick-row">
+                  <button class="pick" data-info="<b>机械开关</b>：闭合 = <code>1</code>，断开 = <code>0</code>">🔌 机械开关</button>
+                  <button class="pick" data-info="<b>晶体管电平（正逻辑）</b>：高电平（如 +5 V / +3.3 V）= <code>1</code>，低电平（如 0 V）= <code>0</code>">⚡ 电压电平</button>
+                  <button class="pick" data-info="<b>逻辑命题</b>：真（True）= <code>1</code>，假（False）= <code>0</code>">💡 逻辑真假</button>
+                </div>
+                <div class="picker-out muted">👆 点击查看开关量的不同物理实现。</div>
+              </div>`
+          },
+          {
+            title: '1.1.3 数字波形',
+            html: `
+              <p>数字波形是逻辑电平随时间变化的矩形脉冲序列，常见参数如下：</p>
+              <ul>
+                <li><b>脉冲幅度 <i>V<sub>m</sub></i></b>：高电平与低电平之差；<b>周期 <i>T</i></b> 与 <b>频率 <i>f</i> = 1/<i>T</i></b>。</li>
+                <li><b>脉冲宽度 <i>t<sub>w</sub></i></b>：高电平持续时间；<span class="term" data-tip="占空比 q = tw / T × 100%，描述一个周期内高电平所占比例">占空比</span> <i>q</i> = <i>t<sub>w</sub></i> / <i>T</i>。</li>
+                <li><b>上升时间 <i>t<sub>r</sub></i> / 下降时间 <i>t<sub>f</sub></i></b>：电平从 10% 升到 90%（或 90% 降到 10%）的时间。</li>
+              </ul>`
+          }
+        ]
+      },
+      {
+        title: '1.2 数制与码制',
+        subs: [
+          {
+            title: '1.2.1 进位计数制',
+            html: `
+              <p>进位计数制由<span class="term" data-tip="每位允许使用的数码个数，如二进制基数为 2">基数</span>和<span class="term" data-tip="第 i 位上的 1 所代表的数值大小，等于基数的 i 次方">位权</span>确定：</p>
+              <table>
+                <thead><tr><th>数制</th><th>基数</th><th>数码</th><th>进位规则</th><th>后缀</th></tr></thead>
+                <tbody>
+                  <tr><td>二进制</td><td>2</td><td>0, 1</td><td>逢二进一</td><td>B</td></tr>
+                  <tr><td>八进制</td><td>8</td><td>0 ~ 7</td><td>逢八进一</td><td>O / Q</td></tr>
+                  <tr><td>十进制</td><td>10</td><td>0 ~ 9</td><td>逢十进一</td><td>D</td></tr>
+                  <tr><td>十六进制</td><td>16</td><td>0 ~ 9, A ~ F</td><td>逢十六进一</td><td>H</td></tr>
+                </tbody>
+              </table>`
+          },
+          {
+            title: '1.2.2 进位计数制的相互转换',
+            html: `
+              <div class="tabs">
+                <div data-tab="R 进制 → 十进制">
+                  <p><b>按权展开求和</b>：(1101.1)<sub>2</sub> = 1×8 + 1×4 + 0×2 + 1×1 + 1×0.5 = <b>13.5</b>。</p>
+                </div>
+                <div data-tab="十进制 → 二进制">
+                  <p><b>整数除 2 取余逆序排；小数乘 2 取整顺序排。</b></p>
+                  <ol class="steps">
+                    <li>25 ÷ 2 = 12 …… 余 <b>1</b></li>
+                    <li>12 ÷ 2 = 6 …… 余 <b>0</b></li>
+                    <li>6 ÷ 2 = 3 …… 余 <b>0</b></li>
+                    <li>3 ÷ 2 = 1 …… 余 <b>1</b></li>
+                    <li>1 ÷ 2 = 0 …… 余 <b>1</b> ⇒ (25)<sub>10</sub> = <b>(11001)<sub>2</sub></b> ✅</li>
+                  </ol>
+                </div>
+                <div data-tab="二 ↔ 八 / 十六">
+                  <p><b>三位一组</b>转八进制，<b>四位一组</b>转十六进制（以小数点为界向两侧补 0）。</p>
+                </div>
+              </div>
+              <div class="widget" id="base-converter">
+                <b>🧮 实时进制转换器</b>
+                <div class="widget-row" style="margin-top:8px">
+                  <input class="input" value="25" placeholder="输入非负整数" style="flex:1;min-width:140px;font-family:var(--mono)" />
+                  <select class="input">
+                    <option value="10" selected>十进制</option>
+                    <option value="2">二进制</option>
+                    <option value="8">八进制</option>
+                    <option value="16">十六进制</option>
+                  </select>
+                </div>
+                <div class="conv-out"></div>
+              </div>`
+          },
+          {
+            title: '1.2.3 二进制编码',
+            html: `
+              <p>用二进制代码表示十进制数字、字符或特定信息称为编码：</p>
+              <ul>
+                <li><b>8421 BCD 码</b>：有权码，4 位二进制表示 1 位十进制（<code>0000</code>~<code>1001</code>，<code>1010</code>~<code>1111</code> 为伪码）。</li>
+                <li><b>格雷码（Gray Code）</b>：无权码，任意两个相邻代码之间<b>只有 1 位不同</b>，可消除状态切换时的过渡噪声。</li>
+                <li><b>ASCII 码</b>：7 位二进制表示 128 个常用字符（<code>'0'=48</code>, <code>'A'=65</code>, <code>'a'=97</code>）。</li>
+              </ul>`
+          }
+        ]
+      },
+      {
+        title: '1.3 逻辑函数及其描述工具',
+        subs: [
+          {
+            title: '1.3.1 逻辑函数的基本概念',
+            html: `
+              <p>若输出逻辑变量 <i>Y</i> 的取值唯一取决于输入逻辑变量 <i>A, B, C, …</i> 的组合，则称 <i>Y = F(A, B, C, …)</i> 为<b>逻辑函数</b>。输入与输出均只取 <code>0</code> 或 <code>1</code>。</p>`
+          },
+          {
+            title: '1.3.2 逻辑函数的描述工具',
+            html: `
+              <p>描述同一逻辑函数的五种常见工具：<b>真值表</b>、<b>逻辑表达式</b>、<b>逻辑图</b>、<b>波形图</b>、<b>卡诺图</b>，它们之间可以相互转换。</p>`
+          },
+          {
+            title: '1.3.3 基本逻辑运算',
+            html: `
+              <p>三种基本运算为<b>与（AND）</b>、<b>或（OR）</b>、<b>非（NOT）</b>，由此复合出与非、或非、异或（<i>A</i> ⊕ <i>B</i>）、同或（<i>A</i> ⊙ <i>B</i>）。</p>
+              <div class="widget" id="gate-sim">
+                <b>⚡ 逻辑门交互模拟器（点击切换输入电平）</b>
+                <div class="widget-row" style="margin-top:8px">
+                  <button class="btn bit-btn" data-bit="A">A = 0</button>
+                  <button class="btn bit-btn" data-bit="B">B = 0</button>
+                </div>
+                <div id="gate-out"></div>
+              </div>`
+          },
+          {
+            title: '1.3.4 正逻辑、负逻辑、三态门',
+            html: `
+              <ul>
+                <li><b>正逻辑</b>：高电平 = 1，低电平 = 0；<b>负逻辑</b>：低电平 = 1，高电平 = 0。同一物理电路在正/负逻辑下功能互为对偶（正逻辑与门 = 负逻辑或门）。</li>
+                <li><b>三态门（TSL）</b>：输出除 <code>0</code>、<code>1</code> 外还有<b>高阻态（Z）</b>，常用于多设备共享总线，避免输出冲突。</li>
+              </ul>`
+          }
+        ]
+      },
+      {
+        title: '1.4 布尔代数',
+        subs: [
+          {
+            title: '1.4.1 布尔代数的基本定律',
+            html: `
+              <table>
+                <thead><tr><th>定律名称</th><th>与运算形式</th><th>或运算形式</th></tr></thead>
+                <tbody>
+                  <tr><td>交换律</td><td><i>A · B = B · A</i></td><td><i>A + B = B + A</i></td></tr>
+                  <tr><td>结合律</td><td>(<i>A · B</i>)<i>C</i> = <i>A</i>(<i>B · C</i>)</td><td>(<i>A + B</i>) + <i>C</i> = <i>A</i> + (<i>B + C</i>)</td></tr>
+                  <tr><td>分配律</td><td><i>A</i>(<i>B + C</i>) = <i>AB + AC</i></td><td><i>A + BC</i> = (<i>A + B</i>)(<i>A + C</i>)</td></tr>
+                  <tr><td>重叠律 / 互补律</td><td><i>A · A = A</i>，<i>A · <span class="ov">A</span></i> = 0</td><td><i>A + A = A</i>，<i>A + <span class="ov">A</span></i> = 1</td></tr>
+                  <tr><td>吸收律</td><td><i>A + AB = A</i></td><td><i>A + <span class="ov">A</span>B = A + B</i></td></tr>
+                  <tr><td>狄摩根定律（反演律）</td><td><span class="ov"><i>A · B</i></span> = <span class="ov"><i>A</i></span> + <span class="ov"><i>B</i></span></td><td><span class="ov"><i>A + B</i></span> = <span class="ov"><i>A</i></span> · <span class="ov"><i>B</i></span></td></tr>
+                </tbody>
+              </table>`
+          },
+          {
+            title: '1.4.2 布尔代数运算的基本规则',
+            html: `
+              <ul>
+                <li><b>代入规则</b>：等式中所有出现同一变量的地方，用同一逻辑函数替换，等式仍成立。</li>
+                <li><b>反演规则</b>：将「·」换「+」，「+」换「·」，<code>0</code> 换 <code>1</code>，<code>1</code> 换 <code>0</code>，原变量换反变量、反变量换原变量，即得反函数 <span class="ov"><i>F</i></span>（注意保持原运算优先级）。</li>
+                <li><b>对偶规则</b>：同反演规则，但<b>不改变原变量与反变量</b>，得到对偶式 <i>F</i>*。</li>
+              </ul>`
+          },
+          {
+            title: '1.4.3 用布尔代数简化逻辑函数',
+            html: `
+              <p>化简目标：使表达式的<b>乘积项最少</b>，且每个乘积项中的<b>变量最少</b>（最简与或式）。</p>
+              <details class="fold"><summary>例题：化简 <i>Y = AB + A<span class="ov">B</span> + <span class="ov">A</span>B</i></summary><div class="fold-body">
+                <ol class="steps">
+                  <li>前两项合并：<i>AB + A<span class="ov">B</span> = A(B + <span class="ov">B</span>) = A</i></li>
+                  <li>代入吸收律：<i>Y = A + <span class="ov">A</span>B = A + B</i> ✅</li>
+                </ol>
+              </div></details>`
+          }
+        ]
+      },
+      {
+        title: '1.5 卡诺图',
+        subs: [
+          {
+            title: '1.5.1 卡诺图的结构与特点',
+            html: `
+              <p><span class="term" data-tip="按格雷码顺序排列最小项的二维方格图">卡诺图</span>中，几何上<b>相邻（含上下、左右边缘循环相邻）的方格</b>在逻辑上也只差一个变量，合并后即可消去该变量。</p>
+              <div class="widget" id="kmap-demo">
+                <b>🧩 交互式 4 变量卡诺图（点击方格切换 0 / 1 / ×）</b>
+                <div id="kmap-grid" style="margin-top:8px"></div>
+                <div class="muted" id="kmap-info"></div>
+              </div>`
+          },
+          {
+            title: '1.5.2 用卡诺图简化逻辑函数',
+            html: `
+              <div class="callout key"><b>卡诺图化简三步法</b>
+                ① 填入真值表（1 填最小项，任意项填 ×）；<br>
+                ② 按 2<sup><i>k</i></sup> 个相邻 1 格画圈（圈越大越好、圈数越少越好、每个圈至少含 1 个未被覆盖的新 1 格）；<br>
+                ③ 保留圈内取值不变的变量，写出最简与或式。
+              </div>`
+          }
+        ]
+      },
+      {
+        title: '1.6 数字集成电路',
+        subs: [
+          {
+            title: '1.6.1 集成电路的制造技术类型',
+            html: `
+              <ul>
+                <li><b>TTL（双极型）</b>：速度较快、驱动能力强，但功耗较大（典型如 74LS 系列）。</li>
+                <li><b>CMOS（单极型）</b>：静态功耗极低、电源电压范围宽、抗干扰强（典型如 74HC、4000 系列），是当前主流。</li>
+              </ul>`
+          },
+          {
+            title: '1.6.2 集成电路的封装类型',
+            html: `<p>常见封装：<b>DIP</b>（双列直插式，方便实验插面包板）、<b>SOP / SOIC</b>（小外形贴片）、<b>QFP</b>（四方扁平封装）、<b>BGA</b>（球栅阵列，适合高引脚数芯片）。</p>`
+          },
+          {
+            title: '1.6.3 集成电路的规模类型',
+            html: `<p>按集成门数分为：<b>SSI</b>（小规模，&lt;10 门）、<b>MSI</b>（中规模，10~99 门，如译码器/计数器）、<b>LSI</b>（大规模，100~9999 门）、<b>VLSI / ULSI</b>（超大规模，≥10⁴ 门，如 CPU）。</p>`
+          },
+          {
+            title: '1.6.4 集成电路的使用特性',
+            html: `<p>重点关注：<b>扇出系数 <i>N<sub>O</sub></i></b>（一个门最多可带动的同类门负载数）、<b>传输延迟时间 <i>t<sub>pd</sub></i></b>、<b>噪声容限</b>（抗干扰能力）以及 <b>多余输入端的处理</b>（TTL 悬空相当于高电平；CMOS 严禁悬空，与门接 <i>V<sub>DD</sub></i>、或门接地）。</p>`
+          }
+        ]
+      }
+    ],
+    quiz: [
+      { type: 'choice', q: '下列编码中，任意两个相邻代码之间只有一位不同的是：', options: ['8421 BCD 码', '格雷码', 'ASCII 码', '余 3 码'], answer: 1, explain: '格雷码（循环码）任意相邻两组代码之间只有 1 位发生变化。' },
+      { type: 'fill', q: '十进制数 25 对应的二进制数是 ______。', answer: ['11001'], explain: '25 = 16 + 8 + 1 = (11001)₂。' },
+      { type: 'choice', q: '根据吸收律，逻辑式 A + A\'B 化简的结果是：', options: ['A', 'B', 'A + B', 'AB'], answer: 2, explain: 'A + A\'B = (A + A\')(A + B) = A + B。' },
+      { type: 'choice', q: '卡诺图化简时，画圈所包含的相邻最小项个数必须是：', options: ['任意正整数', '偶数', '2 的幂次（1, 2, 4, 8…）', '质数'], answer: 2, explain: '只有包含 2^k 个逻辑相邻方格的矩形圈，才能消去 k 个变量。' },
+      { type: 'fill', q: '三态门除了高电平和低电平外，第三种输出状态称为 ______。', answer: ['高阻态', '高阻', 'Z'], explain: '三态门的三种状态为：0（低电平）、1（高电平）和高阻态（Z）。' },
+      { type: 'choice', q: '关于 CMOS 集成电路的多余输入端，正确的处理方式是：', options: ['可以悬空', '严禁悬空，应根据逻辑功能接高或低电平', '一律接地', '一律接电源'], answer: 1, explain: 'CMOS 输入阻抗极高，悬空易受静电干扰损坏或产生误动作，必须按逻辑要求接确定电平。' }
+    ],
+    mount(root) {
+      // 1. 进制转换器
+      const conv = root.querySelector('#base-converter');
+      if (conv) {
+        const inp = conv.querySelector('input'), sel = conv.querySelector('select'), out = conv.querySelector('.conv-out');
+        const rules = { 2: /^[01]+$/, 8: /^[0-7]+$/, 10: /^\d+$/, 16: /^[0-9A-F]+$/ };
+        const run = () => {
+          const b = +sel.value, raw = inp.value.trim().toUpperCase();
+          if (!raw) { out.innerHTML = '<span class="muted">请输入非负整数</span>'; return; }
+          if (!rules[b].test(raw)) { out.innerHTML = `<span style="color:var(--danger)">输入不合法</span>`; return; }
+          const n = parseInt(raw, b);
+          if (!Number.isSafeInteger(n)) { out.innerHTML = '<span style="color:var(--danger)">数值过大</span>'; return; }
+          out.innerHTML = `<table><tbody>
+            <tr><th>二进制</th><td><code>${n.toString(2)}</code></td><th>八进制</th><td><code>${n.toString(8)}</code></td></tr>
+            <tr><th>十进制</th><td><code>${n}</code></td><th>十六进制</th><td><code>${n.toString(16).toUpperCase()}</code></td></tr>
+          </tbody></table>`;
+        };
+        inp.addEventListener('input', run); sel.addEventListener('change', run); run();
+      }
+      // 2. 逻辑门模拟器
+      const sim = root.querySelector('#gate-sim');
+      if (sim) {
+        let A = 0, B = 0;
+        const out = sim.querySelector('#gate-out');
+        const draw = () => {
+          sim.querySelector('[data-bit="A"]').textContent = 'A = ' + A;
+          sim.querySelector('[data-bit="A"]').classList.toggle('hi', A === 1);
+          sim.querySelector('[data-bit="B"]').textContent = 'B = ' + B;
+          sim.querySelector('[data-bit="B"]').classList.toggle('hi', B === 1);
+          out.innerHTML = `<table><thead><tr><th>与 (A·B)</th><th>或 (A+B)</th><th>非 (Ā)</th><th>与非</th><th>或非</th><th>异或 (A⊕B)</th><th>同或 (A⊙B)</th></tr></thead>
+            <tbody><tr><td><b>${A & B}</b></td><td><b>${A | B}</b></td><td><b>${1 - A}</b></td><td><b>${1 - (A & B)}</b></td><td><b>${1 - (A | B)}</b></td><td><b>${A ^ B}</b></td><td><b>${1 - (A ^ B)}</b></td></tr></tbody></table>`;
+        };
+        sim.querySelector('[data-bit="A"]').onclick = () => { A ^= 1; draw(); };
+        sim.querySelector('[data-bit="B"]').onclick = () => { B ^= 1; draw(); };
+        draw();
+      }
+      // 3. 卡诺图交互
+      const km = root.querySelector('#kmap-grid');
+      if (km) {
+        const grays = ['00', '01', '11', '10'];
+        const vals = Array(16).fill(0);
+        [1, 3, 5, 7, 13, 15].forEach(i => vals[i] = 1);
+        const info = root.querySelector('#kmap-info');
+        const renderK = () => {
+          let h = '<div class="kmap"><div class="kh">AB\\CD</div>' + grays.map(g => `<div class="kh">${g}</div>`).join('');
+          grays.forEach((ra, r) => {
+            h += `<div class="kh">${ra}</div>`;
+            grays.forEach((ca, c) => {
+              const idx = parseInt(ra + ca, 2);
+              const v = vals[idx];
+              h += `<button type="button" class="kc ${v === 1 ? 'v1' : v === '×' ? 'vx' : ''}" data-i="${idx}">${v}</button>`;
+            });
+          });
+          km.innerHTML = h + '</div>';
+          const mins = vals.map((v, i) => v === 1 ? 'm' + i : '').filter(Boolean);
+          info.innerHTML = `当前最小项：<code>Σm(${mins.map(x => x.slice(1)).join(', ') || '∅'})</code>（点击方格可在 0 / 1 / × 之间切换）`;
+          km.querySelectorAll('.kc').forEach(b => b.onclick = () => {
+            const i = +b.dataset.i;
+            vals[i] = vals[i] === 0 ? 1 : vals[i] === 1 ? '×' : 0;
+            renderK();
+          });
+        };
+        renderK();
+      }
+    }
+  },
+
+  /* -------------------- 第2章 组合逻辑 -------------------- */
+  {
+    id: 2,
+    title: '组合逻辑',
+    author: 'NiLuo',
+    updated: '2026-11-18',
+    summary: '组合逻辑分析与设计、等价变换、选择器/分配器、译码器/编码器、比较器/加法器与奇偶校验',
+    intro: '组合逻辑电路任意时刻的输出仅取决于该时刻的输入，不含记忆元件。本章系统学习组合逻辑的分析、设计、等价变换以及常用中规模组合逻辑部件。',
+    sections: [
+      {
+        title: '2.1 组合逻辑分析',
+        subs: [
+          { title: '2.1.1 逐级电平推导法', html: '<p>从输入端开始，按信号流向逐级推导出各中间节点及输出端的电平关系，直观但仅适合简单电路。</p>' },
+          { title: '2.1.2 列写布尔表达式法', html: '<p>从输入到输出逐级写出各逻辑门的输出表达式，经布尔代数或卡诺图化简后，再由最简表达式概括电路逻辑功能。</p>' },
+          { title: '2.1.3 数字波形图分析法', html: '<p>给定各输入信号的时序波形，逐时段求得输出电平并画出输出波形图，常用于验证功能与观察瞬态毛刺。</p>' },
+          { title: '2.1.4 列写逻辑电路真值表法', html: '<p>列出所有 2<sup><i>n</i></sup> 种输入组合对应的输出值。真值表唯一确定电路的逻辑功能。</p>' },
+          {
+            title: '2.1.5 组合逻辑中的竞争冒险',
+            html: `
+              <p>同一信号经不同路径到达某门输入端时，由于门延迟不同产生时间差，称为<span class="term" data-tip="信号到达同一逻辑门的时间先后不一，可能导致瞬时错误脉冲">竞争</span>；由此使输出产生不应有的尖峰脉冲，称为<b>冒险（毛刺）</b>。</p>
+              <div class="callout warn"><b>消除冒险的常用方法</b>
+                ① 增加冗余乘积项（如 <i>Y = AB + <span class="ov">A</span>C</i> 补充冗余项 + <i>BC</i>）；<br>
+                ② 输出端并联小电容滤波；<br>
+                ③ 引入选通脉冲（只在稳定后采样）。
+              </div>`
+          }
+        ]
+      },
+      {
+        title: '2.2 组合逻辑设计',
+        subs: [
+          {
+            title: '2.2.1 组合逻辑设计步骤',
+            html: `
+              <ol class="steps">
+                <li><b>逻辑抽象</b>：确定输入变量和输出变量，并对状态进行 0/1 编码。</li>
+                <li><b>列真值表</b>：根据题意列出输入与输出的对应关系。</li>
+                <li><b>化简表达式</b>：用卡诺图或布尔代数求最简表达式。</li>
+                <li><b>画逻辑图</b>：根据所选门电路类型（如与非门）画出电路图。</li>
+              </ol>`
+          },
+          { title: '2.2.2 逻辑问题的描述', html: '<p>将文字描述的实际需求转化为严谨的真值表或卡诺图，重点要分清正逻辑条件与约束条件。</p>' },
+          { title: '2.2.3 利用任意项的逻辑设计', html: '<p>对于实际不会出现的输入组合（如 8421 BCD 码的 <code>1010~1111</code>），其输出记为<b>任意项（× / d）</b>。在卡诺图化简时，把有助于扩大圈的 × 当作 <code>1</code>，其余当作 <code>0</code>，可大幅简化电路。</p>' }
+        ]
+      },
+      {
+        title: '2.3 组合逻辑电路的等价变换',
+        subs: [
+          { title: '2.3.1 狄摩根定理的应用', html: '<p>利用 <span class="ov"><i>A+B</i></span> = <span class="ov"><i>A</i></span>·<span class="ov"><i>B</i></span> 与 <span class="ov"><i>AB</i></span> = <span class="ov"><i>A</i></span>+<span class="ov"><i>B</i></span>，实现与/或结构与非门结构之间的互换。</p>' },
+          { title: '2.3.2 与非门、或非门作为通用元件', html: '<p>仅用<b>与非门</b>（或仅用<b>或非门</b>）即可实现与、或、非三种基本运算，从而实现任意组合逻辑函数，因此二者被称为<b>通用逻辑元件</b>。</p>' },
+          { title: '2.3.3 利用与非门/或非门进行等价变换', html: '<p><b>与或式 → 全与非门</b>：对最简与或式两次求反，<i>Y = AB + CD</i> = <span class="ov"><span class="ov"><i>AB</i></span> · <span class="ov"><i>CD</i></span></span>，即「与-与」结构直接变为「与非-与非」。<b>或与式 → 全或非门</b>：同样两次求反，变为「或非-或非」。</p>' },
+          { title: '2.3.4 逻辑函数的“与或非”门实现', html: '<p>求原函数的反函数 <span class="ov"><i>Y</i></span> 的最简与或式，再整体求反 <i>Y</i> = <span class="ov"><span class="ov"><i>Y</i></span></span>，即可直接用单片「与或非」门实现。</p>' }
+        ]
+      },
+      {
+        title: '2.4 数据选择器与分配器',
+        subs: [
+          {
+            title: '2.4.1 数据选择器（MUX）',
+            html: `
+              <p>从 2<sup><i>n</i></sup> 路输入数据中，根据 <i>n</i> 位地址选择信号 <i>S</i> 选出 1 路送到输出端（多选一）。常见芯片：<b>74LS151</b>（8 选 1）、<b>74LS153</b>（双 4 选 1）。</p>
+              <div class="callout tip"><b>重要应用：用 MUX 实现任意逻辑函数</b>将部分输入变量接地址端，其余变量或 0/1 接数据输入端即可无需门电路直接实现函数。</div>`
+          },
+          { title: '2.4.2 数据分配器（DEMUX）', html: '<p>与选择器相反，将 1 路输入数据根据地址选择信号分配到 2<sup><i>n</i></sup> 路输出中的某一路（一分多），可用带使能端的译码器实现。</p>' }
+        ]
+      },
+      {
+        title: '2.5 译码器和编码器',
+        subs: [
+          {
+            title: '2.5.1 译码器（Decoder）',
+            html: `
+              <p>将二进制代码还原为对应输出信号（如 3-8 线译码器 <b>74LS138</b>：3 位输入对应 8 个低电平有效输出 <span class="ov"><i>Y</i><sub>0</sub></span> ~ <span class="ov"><i>Y</i><sub>7</sub></span>）。配合与非门可实现任意组合逻辑函数；<b>74LS48</b> 为七段数码管显示译码器。</p>`
+          },
+          {
+            title: '2.5.2 编码器（Encoder）',
+            html: `
+              <p>将多个有效信号编成二进制代码：</p>
+              <ul>
+                <li><b>普通编码器</b>：每次只允许一个输入有效。</li>
+                <li><b>优先编码器（如 74LS148，8-3 线）</b>：允许多个输入同时有效，只对<b>优先级最高</b>的输入进行编码。</li>
+              </ul>`
+          }
+        ]
+      },
+      {
+        title: '2.6 数据比较器和加法器',
+        subs: [
+          { title: '2.6.1 数据比较器', html: '<p>比较两个二进制数 <i>A</i> 与 <i>B</i> 的大小，输出 <i>A &gt; B</i>、<i>A = B</i>、<i>A &lt; B</i> 三种结果（典型 4 位级联芯片：<b>74LS85</b>）。</p>' },
+          {
+            title: '2.6.2 加法器',
+            html: `
+              <ul>
+                <li><b>半加器</b>：只相加本位 <i>A、B</i>，不考虑低位进位：<i>S = A ⊕ B</i>，<i>C = AB</i>。</li>
+                <li><b>全加器（FA）</b>：考虑低位进位 <i>C<sub>in</sub></i>：<i>S = A ⊕ B ⊕ C<sub>in</sub></i>，<i>C<sub>out</sub> = AB + (A ⊕ B)C<sub>in</sub></i>。</li>
+                <li><b>多位加法器</b>：行波进位加法器（简单但有进位延迟）与 <b>超前进位加法器</b>（并行计算各位进位，速度快，如 74LS283）。</li>
+              </ul>`
+          }
+        ]
+      },
+      {
+        title: '2.7 奇偶校验器',
+        subs: [
+          { title: '2.7.1 奇偶校验的基本原理', html: '<p>通过附加 1 位校验位，使整个代码（数据位 + 校验位）中 <code>1</code> 的总个数为奇数（<b>奇校验</b>）或偶数（<b>偶校验</b>），核心部件是<b>异或门</b>树。</p>' },
+          { title: '2.7.2 具有奇偶校验的数据传输', html: '<p>发送端产生校验位随数据发出，接收端重新计算校验位：若发现奇偶性不符则说明传输中发生了<b>奇数位错误</b>（注意：偶数位同时出错无法检出，且不能自动纠错）。</p>' }
+        ]
+      }
+    ],
+    quiz: [
+      { type: 'choice', q: '组合逻辑电路的输出信号取决于：', options: ['仅当前输入', '当前输入与原来状态', '时钟脉冲边沿', '仅原来状态'], answer: 0, explain: '组合逻辑无记忆元件，任意时刻输出仅由该时刻输入决定。' },
+      { type: 'choice', q: '下列芯片中，属于 3 线-8 线译码器的是：', options: ['74LS151', '74LS138', '74LS148', '74LS85'], answer: 1, explain: '74LS138 是 3-8 译码器；151 是 8 选 1 MUX；148 是 8-3 优先编码器；85 是 4 位比较器。' },
+      { type: 'fill', q: '半加器本位和 S 的逻辑表达式为 S = ______（用 A、B 和 ⊕ 表示）。', answer: ['A⊕B', 'A^B'], explain: '半加器不考虑低位进位，本位和 S = A ⊕ B，进位 C = AB。' },
+      { type: 'choice', q: '用 8 选 1 数据选择器最多可以直接实现几个变量的任意逻辑函数？', options: ['3 个', '4 个', '8 个', '2 个'], answer: 1, explain: '3 个地址端接 3 个变量，第 4 个变量及其反变量或 0/1 接数据端，共可实现 4 变量函数。' },
+      { type: 'choice', q: '奇偶校验码在数据传输中能够检测出：', options: ['任意多位错误', '奇数个位错误', '偶数个位错误', '并能自动纠正 1 位错'], answer: 1, explain: '奇偶校验只能发现奇数个位发生翻转的错误，不能检出偶数位错误，也不能纠错。' }
+    ]
+  },
+
+  /* -------------------- 第3章 时序逻辑 -------------------- */
+  {
+    id: 3,
+    title: '时序逻辑',
+    author: '成员C',
+    updated: '2026-11-18',
+    summary: '锁存器、触发器、寄存器、计数器、定时脉冲产生器以及同步时序逻辑分析与设计',
+    intro: '时序逻辑电路由组合逻辑电路和存储（记忆）元件组成，其输出不仅取决于当前输入，还与电路原来的状态有关。',
+    sections: [
+      {
+        title: '3.1 锁存器',
+        subs: [
+          { title: '3.1.1 锁存器的基本特性', html: '<p>锁存器是对<b>脉冲电平敏感</b>的双稳态存储单元，在使能信号有效期间输出随输入变化，使能无效时锁存当前状态。</p>' },
+          { title: '3.1.2 基本 SR 锁存器', html: '<p>由两个与非门（或或非门）交叉耦合而成。以或非门 SR 锁存器为例：<code>S=1,R=0</code> 置 1；<code>S=0,R=1</code> 置 0；<code>S=0,R=0</code> 保持；<b><code>S=1,R=1</code> 为禁止/约束状态</b>。</p>' },
+          { title: '3.1.3 门控 SR 锁存器', html: '<p>在基本 SR 锁存器输入端增加控制门和使能端 <i>E</i>：只有当 <i>E</i> = 1 时 <i>S、R</i> 才起作用；<i>E</i> = 0 时保持状态不变。</p>' },
+          { title: '3.1.4 门控 D 锁存器', html: '<p>将 <i>S = D</i>，<i>R</i> = <span class="ov"><i>D</i></span> 相连，彻底消除了 SR 锁存器的约束状态。<i>E</i> = 1 时 <i>Q</i> 跟随 <i>D</i>（透明传输）；<i>E</i> = 0 时锁存数据。</p>' }
+        ]
+      },
+      {
+        title: '3.2 触发器',
+        subs: [
+          { title: '3.2.1 SR 触发器', html: '<p>触发器是对<b>时钟脉冲（CLK）边沿敏感</b>（上升沿 ↑ 或下降沿 ↓）的双稳态器件，克服了电平触发的「空翻」现象。</p>' },
+          { title: '3.2.2 D 触发器', html: '<p>特性方程：<b><i>Q</i><sup><i>n</i>+1</sup> = <i>D</i></b>。时钟有效边沿到来时，将输入端 <i>D</i> 的数据打入输出端 <i>Q</i>，结构最简洁，广泛用于寄存器和移位寄存器。</p>' },
+          {
+            title: '3.2.3 JK 触发器',
+            html: `
+              <p>特性方程：<b><i>Q</i><sup><i>n</i>+1</sup> = <i>J</i><span class="ov"><i>Q<sup>n</sup></i></span> + <span class="ov"><i>K</i></span><i>Q<sup>n</sup></i></b>。功能最全，无约束条件。</p>
+              <div class="picker">
+                <div class="pick-row">
+                  <button class="pick" data-info="<b>J = 0, K = 0</b>：<i>Q</i><sup><i>n</i>+1</sup> = <i>Q<sup>n</sup></i>（<b>保持</b>原状态不变）">J=0, K=0</button>
+                  <button class="pick" data-info="<b>J = 0, K = 1</b>：<i>Q</i><sup><i>n</i>+1</sup> = 0（<b>置 0 / 复位</b>）">J=0, K=1</button>
+                  <button class="pick" data-info="<b>J = 1, K = 0</b>：<i>Q</i><sup><i>n</i>+1</sup> = 1（<b>置 1 / 置位</b>）">J=1, K=0</button>
+                  <button class="pick" data-info="<b>J = 1, K = 1</b>：<i>Q</i><sup><i>n</i>+1</sup> = <span class="ov"><i>Q<sup>n</sup></i></span>（<b>翻转 / 计数</b>）">J=1, K=1</button>
+                </div>
+                <div class="picker-out muted">👆 点击查看 JK 触发器在时钟边沿下的状态变化。</div>
+              </div>`
+          },
+          { title: '3.2.4 触发器的应用和时间参数', html: '<p>重要时间参数：<b>建立时间 <i>t<sub>su</sub></i></b>（时钟边沿前数据必须提前稳定的时间）、<b>保持时间 <i>t<sub>h</sub></i></b>（时钟边沿后数据必须继续保持的时间）、<b>传输延迟 <i>t<sub>pd</sub></i></b>、最高工作频率 <i>f<sub>max</sub></i>。</p>' }
+        ]
+      },
+      {
+        title: '3.3 寄存器和移位寄存器',
+        subs: [
+          { title: '3.3.1 寄存器', html: '<p>由 <i>n</i> 个 D 触发器共用同一个时钟脉冲构成，用于一次性并行存入和保存 <i>n</i> 位二进制数据（如 74LS175）。</p>' },
+          { title: '3.3.2 移位寄存器', html: '<p>将多个触发器首尾级联，在时钟脉冲作用下数据逐位左移或右移（如 <b>74LS194</b> 双向移位寄存器），可用于<b>串/并转换</b>、环形计数器和序列信号发生器。</p>' }
+        ]
+      },
+      {
+        title: '3.4 计数器',
+        subs: [
+          { title: '3.4.1 同步计数器', html: '<p>所有触发器共用同一个时钟脉冲 <i>CP</i>，状态同时翻转，<b>工作速度快、无累积延迟</b>。</p>' },
+          { title: '3.4.2 异步计数器', html: '<p>低位触发器的输出作为高位触发器的时钟信号，电路简单但各级延迟累加，<b>速度较慢</b>，易产生译码毛刺。</p>' },
+          { title: '3.4.3 中规模集成计数器及应用', html: '<p>典型芯片：<b>74LS161</b>（4 位二进制同步加法计数器，异步清零、同步置数）与 <b>74LS160</b>（十进制）。通过<b>清零法</b>或<b>置数法</b>可构成任意进制（如 6 进制、24 进制、60 进制）计数器。</p>' }
+        ]
+      },
+      {
+        title: '3.5 定时脉冲产生器',
+        subs: [
+          { title: '3.5.1 时钟脉冲源电路', html: '<p>利用石英晶体振荡器或 <b>555 定时器</b>构成多谐振荡器，产生稳定频率的矩形波时钟信号。</p>' },
+          { title: '3.5.2 节拍脉冲产生器', html: '<p>由移位寄存器（环形计数器）或「计数器 + 译码器」构成，按顺序输出互不重叠的一组节拍脉冲，用于协调数字系统各步骤有序工作。</p>' },
+          { title: '3.5.3 数字钟', html: '<p>典型综合应用：<b>1 Hz 秒脉冲源 → 60 进制秒计数器 → 60 进制分计数器 → 24 进制时计数器 → 七段译码与数码管显示</b>。</p>' }
+        ]
+      },
+      {
+        title: '3.6 同步时序逻辑分析',
+        subs: [
+          { title: '3.6.1 同步时序逻辑电路的描述工具', html: '<p>四大描述工具：<b>逻辑方程组</b>（驱动方程 + 状态方程 + 输出方程）、<b>状态转换表</b>、<b>状态转换图</b>、<b>时序图</b>。</p>' },
+          {
+            title: '3.6.2 同步时序逻辑电路分析的一般方法',
+            html: `
+              <ol class="steps">
+                <li>从电路图写出各触发器的<b>驱动方程</b>（如 <i>J<sub>i</sub>, K<sub>i</sub></i> 或 <i>D<sub>i</sub></i>）及电路的<b>输出方程</b>。</li>
+                <li>将驱动方程代入触发器特性方程，得到<b>状态方程</b>。</li>
+                <li>列出<b>状态转换表</b>，并画出<b>状态转换图</b>。</li>
+                <li>分析电路逻辑功能，并检查能否<b>自启动</b>（无效状态能否回到有效循环）。</li>
+              </ol>`
+          }
+        ]
+      },
+      {
+        title: '3.7 同步时序逻辑设计',
+        subs: [
+          { title: '3.7.1 同步时序逻辑设计方法和步骤', html: '<p>步骤：<b>逻辑抽象建立原始状态表 → 状态化简（消除等价状态） → 状态编码 → 选定触发器并求驱动方程 → 画逻辑图并检查自启动</b>。</p>' },
+          { title: '3.7.2 建立原始状态表的方法', html: '<p>明确电路要记忆哪些历史条件（如序列检测器「101」需记录已收到的前缀：初始、收到1、收到10），确定每个现态在不同输入下的次态与输出（Mealy 型输出与输入有关，Moore 型输出仅与现态有关）。</p>' },
+          { title: '3.7.3 状态编码', html: '<p>若化简后有 <i>M</i> 个状态，则至少需要 <i>n</i> 个触发器满足 2<sup><i>n</i>−1</sup> &lt; <i>M</i> ≤ 2<sup><i>n</i></sup>。合理的状态分配（尽量让相邻状态编码只差一位）能显著简化后续组合逻辑电路。</p>' }
+        ]
+      }
+    ],
+    quiz: [
+      { type: 'choice', q: '下列器件中，属于时钟边沿触发的是：', options: ['基本 SR 锁存器', '门控 D 锁存器', '边沿 D 触发器', '与非门'], answer: 2, explain: '锁存器是电平敏感，触发器（Flip-Flop）是时钟边沿敏感。' },
+      { type: 'fill', q: 'D 触发器的特性方程是 Q^(n+1) = ______。', answer: ['D'], explain: '时钟有效边沿到来时，输出次态直接等于输入 D。' },
+      { type: 'choice', q: '当 JK 触发器的输入 J = 1、K = 1 时，时钟边沿到来后触发器将：', options: ['保持不变', '置 0', '置 1', '翻转'], answer: 3, explain: 'J=K=1 时，Q^(n+1) = Q\'^n，即状态翻转。' },
+      { type: 'choice', q: '与异步计数器相比，同步计数器最突出的优点是：', options: ['电路更简单', '工作速度快、无累积延迟', '不用时钟信号', '功耗更低'], answer: 1, explain: '同步计数器所有触发器共用同一时钟同时翻转，没有级联累积延迟。' },
+      { type: 'fill', q: '若一个同步时序逻辑电路有 6 个有效状态，至少需要 ______ 个触发器。', answer: ['3', '3个'], explain: '2^2 = 4 < 6 ≤ 2^3 = 8，至少需要 3 个触发器。' }
+    ]
+  }
+];
+
+/* =========================================================
+   3. 页面框架逻辑（抽屉侧边栏、路由、搜索、练习判题、Actions）
+   ========================================================= */
+(function () {
+  'use strict';
+  const main = document.getElementById('main');
+  const drawerBody = document.getElementById('drawerBody');
+  const STORE_KEY = 'cfn-logic-v1';
+  const THEME_KEY = 'cfn-theme-v1';
+
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const strip = html => String(html).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const store = {
+    get() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; } },
+    set(p) { try { localStorage.setItem(STORE_KEY, JSON.stringify(p)); } catch (e) {} }
+  };
+  const member = name => TEAM.find(m => m.name === name) || { name, color: '#6e7781' };
+  const avatar = (name, cls = '') => `<span class="avatar ${cls}" style="background:${member(name).color}">${esc(String(name).slice(0, 1).toUpperCase())}</span>`;
+  const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
+
+  const svg = (cls, inner) => `<svg class="ic ${cls}" viewBox="0 0 16 16" aria-hidden="true">${inner}</svg>`;
+  const I = {
+    folder: svg('', '<path fill="#54aeff" d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"/>'),
+    file: svg('', '<path fill="currentColor" opacity=".7" d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Z"/>'),
+    issue: svg('', '<circle cx="8" cy="8" r="6.25" fill="none" stroke="var(--success)" stroke-width="1.5"/><circle cx="8" cy="8" r="1.5" fill="var(--success)"/>'),
+    done: svg('', '<circle cx="8" cy="8" r="6.25" fill="none" stroke="var(--done)" stroke-width="1.5"/><path d="M5.2 8.2l1.9 1.9 3.7-3.9" fill="none" stroke="var(--done)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'),
+    ok: svg('', '<circle cx="8" cy="8" r="7.5" fill="var(--success)"/><path d="M4.8 8.3l2.1 2.1 4.3-4.5" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>'),
+    bad: svg('', '<circle cx="8" cy="8" r="7.5" fill="var(--danger)"/><path d="M5.4 5.4l5.2 5.2m0-5.2l-5.2 5.2" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/>'),
+    pending: svg('', '<circle cx="8" cy="8" r="6.25" fill="none" stroke="var(--attention)" stroke-width="1.5" stroke-dasharray="3 2"/><circle cx="8" cy="8" r="3" fill="var(--attention)"/>'),
+    idle: svg('', '<circle cx="8" cy="8" r="6.25" fill="none" stroke="var(--fg-muted)" stroke-width="1.5"/>'),
+    caret: '<svg class="caret" viewBox="0 0 16 16" data-caret aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+
+  function chapterStats(c, p = store.get()) {
+    const rec = p[c.id] || {};
+    const total = c.quiz.length;
+    let answered = 0, correct = 0;
+    c.quiz.forEach((_, i) => { if (rec[i]) { answered++; if (rec[i].ok) correct++; } });
+    return { total, answered, correct };
+  }
+  function allStats() {
+    const p = store.get();
+    return CHAPTERS.reduce((s, c) => { const t = chapterStats(c, p); s.total += t.total; s.answered += t.answered; s.correct += t.correct; return s; }, { total: 0, answered: 0, correct: 0 });
+  }
+
+  /* ---------- 弹出式侧边栏控制（打开时背景虚化暗淡） ---------- */
+  const openDrawer = () => document.body.classList.add('drawer-open');
+  const closeDrawer = () => document.body.classList.remove('drawer-open');
+  $('#menuBtn').addEventListener('click', openDrawer);
+  $('#drawerClose').addEventListener('click', closeDrawer);
+  $('#backdrop').addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+  function renderDrawer(view, chId, sub) {
+    const p = store.get(), s = allStats();
+    let h = `<div class="drawer-prog">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>学习进度</span><b>${s.correct} / ${s.total} (${pct(s.correct, s.total)}%)</b></div>
+        <div class="progress"><span style="width:${pct(s.correct, s.total)}%"></span></div>
+      </div>
+      <nav class="tree">
+        <a class="tree-item ${view === 'code' ? 'active' : ''}" href="#/">${I.file}<span class="tree-label">课程总览 · README</span></a>`;
+    CHAPTERS.forEach(c => {
+      const open = c.id === chId;
+      const st = chapterStats(c, p);
+      const badge = st.correct === st.total ? '<span class="tree-badge ok">✓</span>' : st.answered ? `<span class="tree-badge ing">${st.correct}/${st.total}</span>` : '';
+      h += `<div class="tree-folder ${open ? 'open' : ''}">
+          <div class="tree-row ${open && (sub === undefined || sub === '') ? 'active' : ''}" data-href="#/ch/${c.id}">${I.caret}${I.folder}<span class="tree-label">第${c.id}章 ${esc(c.title)}</span>${badge}</div>
+          <div class="tree-children">
+            ${c.sections.map((sec, i) => `
+              <div>
+                <a class="tree-item ${open && sub === String(i) ? 'active' : ''}" href="#/ch/${c.id}/${i}">${I.file}<span class="tree-label">${esc(sec.title)}</span></a>
+                <div class="tree-sublist">${sec.subs.map((sb, j) => `<a class="tree-sub" href="#/ch/${c.id}/${i}/${j}">${esc(sb.title)}</a>`).join('')}</div>
+              </div>`).join('')}
+            <a class="tree-item ${open && sub === 'quiz' ? 'active' : ''}" href="#/ch/${c.id}/quiz">${I.issue}<span class="tree-label">课后练习（${st.correct}/${st.total}）</span></a>
+          </div>
+        </div>`;
+    });
+    h += `<a class="tree-item ${view === 'quiz' ? 'active' : ''}" href="#/quiz">${I.issue}<span class="tree-label">全部练习题</span></a>
+          <a class="tree-item ${view === 'team' ? 'active' : ''}" href="#/team">👥<span class="tree-label">小组分工说明</span></a>
+          <a class="tree-item ${view === 'actions' ? 'active' : ''}" href="#/actions">▶️<span class="tree-label">Actions 学习进度</span></a>
+      </nav>`;
+    drawerBody.innerHTML = h;
+  }
+  drawerBody.addEventListener('click', e => {
+    const row = e.target.closest('.tree-row');
+    if (row) {
+      if (e.target.closest('[data-caret]')) { row.parentElement.classList.toggle('open'); return; }
+      if (row.dataset.href) { location.hash = row.dataset.href; closeDrawer(); }
+      return;
+    }
+    if (e.target.closest('a')) closeDrawer();
+  });
+
+  /* ---------- 通用交互组件增强 ---------- */
+  function enhance(root) {
+    $$('.tabs', root).forEach(tabs => {
+      const panes = Array.from(tabs.children).filter(el => el.dataset.tab);
+      const bar = document.createElement('div');
+      bar.className = 'tab-bar';
+      panes.forEach((pane, i) => {
+        pane.classList.add('tab-pane');
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = pane.dataset.tab;
+        b.onclick = () => panes.forEach((q, j) => { q.hidden = j !== i; bar.children[j].classList.toggle('on', j === i); });
+        bar.appendChild(b);
+      });
+      tabs.prepend(bar);
+      if (bar.children[0]) bar.children[0].click();
+    });
+    $$('.picker', root).forEach(pk => {
+      const out = $('.picker-out', pk), items = $$('.pick', pk);
+      items.forEach(it => it.onclick = () => {
+        items.forEach(x => x.classList.remove('on'));
+        it.classList.add('on');
+        if (!out) return;
+        out.innerHTML = it.dataset.info;
+        out.classList.remove('pop', 'muted'); void out.offsetWidth; out.classList.add('pop');
+      });
+    });
+    $$('.term', root).forEach(t => {
+      t.tabIndex = 0;
+      t.onclick = e => {
+        e.stopPropagation();
+        const was = t.classList.contains('show');
+        $$('.term.show').forEach(x => x.classList.remove('show'));
+        if (!was) t.classList.add('show');
+      };
+    });
+    $$('ol.steps', root).forEach(ol => {
+      const items = $$('li', ol); let n = 0;
+      const btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'btn btn-sm steps-btn';
+      const upd = () => {
+        items.forEach((li, i) => li.classList.toggle('step-hidden', i >= n));
+        btn.textContent = n < items.length ? `▶ 下一步（${n}/${items.length}）` : '↺ 重新演示';
+      };
+      btn.onclick = () => { n = n < items.length ? n + 1 : 0; upd(); };
+      ol.after(btn); upd();
+    });
+  }
+  document.addEventListener('click', () => $$('.term.show').forEach(x => x.classList.remove('show')));
+
+  /* ---------- 首页 ---------- */
+  function renderHome() {
+    const s = allStats();
+    const totalSubs = CHAPTERS.reduce((n, c) => n + c.sections.reduce((m, sec) => m + sec.subs.length, 0), 0);
+    main.innerHTML = `
+      <div class="home-grid">
+        <div>
+          <div class="toolbar">
+            <button class="btn btn-sm" type="button" id="openTreeShortcut">☰ 打开章节目录</button>
+            <span class="stat">${I.folder}<b>${CHAPTERS.length}</b> 章</span>
+            <span class="stat">${I.file}<b>${totalSubs}</b> 个小节</span>
+            <span class="stat">${I.issue}<b>${s.total}</b> 道练习</span>
+            <span class="spacer"></span>
+            <a class="btn btn-primary" href="#/ch/1">▶ 开始学习第1章</a>
+          </div>
+          <div class="box">
+            <div class="box-header">${avatar('ry7oll')}<b>ry7oll</b><span class="muted">同步《数字逻辑 / 开关理论》全部章节目录</span><span class="spacer"></span><span class="muted">2026-11-18</span></div>
+            ${CHAPTERS.map(c => {
+              const st = chapterStats(c);
+              return `<div class="file-row">${I.folder}
+                <div class="fname"><a href="#/ch/${c.id}">第${c.id}章 ${esc(c.title)}</a></div>
+                <div class="fmsg">${avatar(c.author)} ${esc(c.summary)}</div>
+                <div class="fdate">${st.correct}/${st.total} ✓</div></div>`;
+            }).join('')}
+            <div class="file-row">${I.file}<div class="fname"><a href="#/team">小组分工说明.md</a></div><div class="fmsg">4 位成员分工与具体贡献</div><div class="fdate">${TEAM.length} 人</div></div>
+          </div>
+          <div class="box">
+            <div class="box-header">📖 <b>README.md</b></div>
+            <article class="markdown-body">
+              <h1>💻 《数字逻辑 / 开关理论》课堂笔记</h1>
+              <p class="lead">点击左上角 <b>☰</b> 按钮可从左侧弹出高亮章节目录（背景自动虚化暗淡，方便专注选章）。页面支持术语悬停提示、例题折叠解析、选项卡、逻辑门与卡诺图交互、以及课后练习即时判题。</p>
+              <h2>📚 课程章节结构</h2>
+              <table><thead><tr><th>章节</th><th>核心节次</th><th>小节数</th><th>负责人</th></tr></thead><tbody>
+                ${CHAPTERS.map(c => `<tr><td><a href="#/ch/${c.id}">第${c.id}章 ${esc(c.title)}</a></td><td>${c.sections.map(x => esc(x.title)).join('、')}</td><td>${c.sections.reduce((m, s) => m + s.subs.length, 0)}</td><td>${avatar(c.author)} ${esc(c.author)}</td></tr>`).join('')}
+              </tbody></table>
+            </article>
+          </div>
+        </div>
+        <aside>
+          <div class="side-block">
+            <h3>课程标签</h3>
+            <div class="topics">${['开关理论', '二进制', '布尔代数', '卡诺图', '组合逻辑', '时序逻辑', '触发器'].map(t => `<a class="topic" href="#/" data-search="${t}">${t}</a>`).join('')}</div>
+          </div>
+          <div class="side-block">
+            <h3>整体学习进度</h3>
+            <div class="progress" style="margin-bottom:6px"><span style="width:${pct(s.correct, s.total)}%"></span></div>
+            <div class="muted">已答对 <b style="color:var(--fg)">${s.correct}</b> / ${s.total} 题 · <a href="#/actions">查看 Actions</a></div>
+          </div>
+          <div class="side-block">
+            <h3>小组成员 <span class="counter">${TEAM.length}</span></h3>
+            <div class="contrib">${TEAM.map(m => `<a href="#/team">${avatar(m.name, 'lg')}<span>${esc(m.name)}</span></a>`).join('')}</div>
+          </div>
+        </aside>
+      </div>`;
+    $('#openTreeShortcut').onclick = openDrawer;
+    $$('[data-search]', main).forEach(a => a.onclick = e => { e.preventDefault(); $('#searchInput').value = a.dataset.search; $('#searchInput').focus(); doSearch(); });
+  }
+
+  /* ---------- 章节页 ---------- */
+  function renderChapter(id, secIdx, subIdx) {
+    const c = CHAPTERS.find(x => x.id === id);
+    if (!c) return renderHome();
+    const mode = secIdx === 'quiz' ? 'quiz' : 'notes';
+    const idx = CHAPTERS.indexOf(c);
+    const prev = CHAPTERS[idx - 1], next = CHAPTERS[idx + 1];
+    main.innerHTML = `
+      <div class="breadcrumb">
+        <button class="btn btn-sm" type="button" id="chMenuBtn">☰ 目录</button>
+        <a href="#/">Computer-Fundamentals-Notes</a> / <b>第${c.id}章 ${esc(c.title)}</b>
+      </div>
+      <div class="box">
+        <div class="box-header">
+          <div class="seg"><a class="${mode === 'notes' ? 'on' : ''}" href="#/ch/${c.id}">笔记正文</a><a class="${mode === 'quiz' ? 'on' : ''}" href="#/ch/${c.id}/quiz">课后练习 <span class="counter">${c.quiz.length}</span></a></div>
+          <span class="spacer"></span>
+          ${avatar(c.author)}<span class="muted">${esc(c.author)} · ${c.sections.length} 节 · ${c.quiz.length} 题</span>
+        </div>
+        ${mode === 'notes' ? `<div class="sec-pills">${c.sections.map((s, i) => `<a href="#/ch/${c.id}/${i}" class="${secIdx === String(i) ? 'on' : ''}">${esc(s.title)}</a>`).join('')}</div>` : ''}
+        <article class="markdown-body" id="content"></article>
+      </div>
+      <div class="pager">
+        ${prev ? `<a href="#/ch/${prev.id}"><small>← 上一章</small>第${prev.id}章 ${esc(prev.title)}</a>` : ''}
+        ${next ? `<a class="next" href="#/ch/${next.id}"><small>下一章 →</small>第${next.id}章 ${esc(next.title)}</a>` : ''}
+      </div>`;
+    $('#chMenuBtn').onclick = openDrawer;
+    const content = $('#content');
+    if (mode === 'notes') {
+      content.innerHTML = `<h1>第${c.id}章 ${esc(c.title)}</h1><p class="lead">${esc(c.intro)}</p>` +
+        c.sections.map((s, i) => `
+          <section class="note-sec" id="sec-${i}">
+            <h2>${esc(s.title)}</h2>
+            ${s.subs.map((sb, j) => `<div class="sub-block" id="sub-${i}-${j}"><h3>${esc(sb.title)}</h3>${sb.html}</div>`).join('')}
+          </section>`).join('') +
+        `<div class="callout tip"><b>本章学完了？</b><a href="#/ch/${c.id}/quiz">去做第${c.id}章课后练习（${c.quiz.length} 题）→</a></div>`;
+      enhance(content);
+      if (typeof c.mount === 'function') c.mount(content);
+      if (secIdx !== undefined && secIdx !== '') {
+        const target = subIdx !== undefined ? document.getElementById(`sub-${secIdx}-${subIdx}`) : document.getElementById(`sec-${secIdx}`);
+        if (target) setTimeout(() => { target.scrollIntoView({ behavior: 'smooth' }); target.classList.add('flash'); }, 30);
+      }
+    } else {
+      renderQuiz(content, c, subIdx);
+    }
+  }
+
+  /* ---------- 练习系统 ---------- */
+  const norm = s => String(s).trim().toLowerCase().replace(/[\s()（）]/g, '');
+  function answerText(q) { return q.type === 'fill' ? esc([].concat(q.answer)[0]) : `${'ABCDEF'[q.answer]}. ${q.options[q.answer]}`; }
+  function renderQuiz(root, c, focusIdx) {
+    const rec = (store.get()[c.id]) || {};
+    root.innerHTML = `
+      <div class="quiz-head"><h1>第${c.id}章 · 课后练习</h1><div class="quiz-score" id="qscore"></div><button class="btn btn-sm btn-danger" id="qreset" type="button">↺ 重做本章</button></div>
+      <div id="qcelebrate"></div>
+      ${c.quiz.map((q, i) => `
+        <div class="qcard" data-i="${i}" id="q-${i}">
+          <div class="qtitle"><span class="qno">${i + 1}</span><span class="qtype">${q.type === 'fill' ? '填空' : '单选'}</span>${esc(q.q)}</div>
+          ${q.type === 'fill'
+            ? `<div class="qfill"><input class="input" placeholder="输入答案，按回车提交" /><button class="btn btn-primary btn-sm" type="button" data-submit>提交</button></div>`
+            : `<div class="qopts">${q.options.map((o, k) => `<button class="qopt" type="button" data-k="${k}"><span class="qkey">${'ABCDEF'[k]}</span><span>${esc(o)}</span></button>`).join('')}</div>`}
+          <div class="qresult" hidden></div>
+          <details class="qpeek"><summary>查看答案与解析</summary><div style="margin-top:6px"><b>答案：</b>${answerText(q)}<br>${esc(q.explain)}</div></details>
+        </div>`).join('')}`;
+
+    const updScore = () => {
+      const st = chapterStats(c);
+      $('#qscore', root).innerHTML = `<span>答对 <b style="color:var(--fg)">${st.correct}</b> / ${st.total}</span><div class="progress"><span style="width:${pct(st.correct, st.total)}%"></span></div>`;
+      $('#qcelebrate', root).innerHTML = st.correct === st.total ? '<div class="celebrate">🎉 本章全部答对！</div>' : '';
+      updateCounter();
+    };
+    const judge = (card, i, val, silent) => {
+      const q = c.quiz[i];
+      let ok;
+      if (q.type === 'fill') {
+        ok = [].concat(q.answer).map(norm).includes(norm(val));
+      } else {
+        ok = val === q.answer;
+        $$('.qopt', card).forEach((b, k) => { b.disabled = true; b.classList.toggle('right', k === q.answer); b.classList.toggle('wrong', k === val && !ok); });
+      }
+      card.classList.toggle('ok', ok); card.classList.toggle('bad', !ok);
+      const res = $('.qresult', card); res.hidden = false; res.className = 'qresult ' + (ok ? 'ok' : 'bad');
+      res.innerHTML = (ok ? '✅ 回答正确！' : `❌ 回答错误。正确答案：<b>${answerText(q)}</b>`) + `<div class="exp">💡 解析：${esc(q.explain)}</div>`;
+      $('.qpeek', card).hidden = true;
+      if (!silent) { const p = store.get(); p[c.id] = p[c.id] || {}; p[c.id][i] = { ok, v: val }; store.set(p); }
+    };
+    $$('.qcard', root).forEach(card => {
+      const i = +card.dataset.i, q = c.quiz[i];
+      if (q.type === 'fill') {
+        const inp = $('input', card);
+        const go = () => { if (inp.value.trim()) judge(card, i, inp.value); updScore(); };
+        $('[data-submit]', card).onclick = go;
+        inp.onkeydown = e => { if (e.key === 'Enter') go(); };
+        if (rec[i]) { inp.value = rec[i].v; judge(card, i, rec[i].v, true); }
+      } else {
+        $$('.qopt', card).forEach(b => b.onclick = () => { judge(card, i, +b.dataset.k); updScore(); });
+        if (rec[i]) judge(card, i, rec[i].v, true);
+      }
+    });
+    $('#qreset', root).onclick = () => { const p = store.get(); delete p[c.id]; store.set(p); renderQuiz(root, c); };
+    updScore();
+    if (focusIdx !== undefined) { const t = document.getElementById('q-' + focusIdx); if (t) setTimeout(() => t.scrollIntoView({ behavior: 'smooth', block: 'center' }), 30); }
+  }
+
+  let quizFilter = 'all';
+  function renderQuizHub() {
+    const p = store.get(), items = [];
+    CHAPTERS.forEach(c => c.quiz.forEach((q, i) => {
+      const r = (p[c.id] || {})[i];
+      items.push({ c, q, i, state: !r ? 'open' : r.ok ? 'done' : 'bad' });
+    }));
+    const cnt = k => items.filter(x => x.state === k).length;
+    const shown = items.filter(x => quizFilter === 'all' || x.state === quizFilter);
+    main.innerHTML = `
+      <div class="page-title"><h1>全部课后练习</h1><span class="muted">点击任意题目直接跳转作答</span></div>
+      <div class="box">
+        <div class="box-header list-head">
+          <button class="ftab ${quizFilter === 'all' ? 'on' : ''}" data-f="all">全部 ${items.length}</button>
+          <button class="ftab ${quizFilter === 'open' ? 'on' : ''}" data-f="open">${I.issue} ${cnt('open')} 未作答</button>
+          <button class="ftab ${quizFilter === 'done' ? 'on' : ''}" data-f="done">${I.done} ${cnt('done')} 已答对</button>
+          <button class="ftab ${quizFilter === 'bad' ? 'on' : ''}" data-f="bad">${I.bad} ${cnt('bad')} 答错</button>
+        </div>
+        ${shown.map(x => `<div class="list-row">${x.state === 'open' ? I.issue : x.state === 'done' ? I.done : I.bad}
+          <div class="lr-main">
+            <a class="lr-title" href="#/ch/${x.c.id}/quiz/${x.i}">${esc(x.q.q)}</a>
+            <div class="lr-meta">第${x.c.id}章 ${esc(x.c.title)} · ${x.q.type === 'fill' ? '填空' : '单选'} · 由 ${esc(x.c.author)} 编写</div>
+          </div></div>`).join('') || '<div style="padding:24px;text-align:center" class="muted">暂无题目</div>'}
+      </div>`;
+    $$('.ftab', main).forEach(b => b.onclick = () => { quizFilter = b.dataset.f; renderQuizHub(); });
+  }
+
+  function renderTeam() {
+    main.innerHTML = `
+      <div class="page-title"><h1>小组分工说明</h1><span class="muted">${TEAM.length} 位成员协作完成</span></div>
+      <div class="box">
+        <div class="box-header">👥 <b>成员列表与具体贡献</b></div>
+        ${TEAM.map((m, n) => `<div class="list-row">${avatar(m.name, 'lg')}
+          <div class="lr-main">
+            <span class="lr-title">${esc(m.name)}</span>
+            <span class="label" style="background:${m.color}22;color:${m.color};border-color:${m.color}55;margin-left:8px">${esc(m.role)}</span>
+            <details open><summary>查看具体贡献</summary><ul>${m.tasks.map(t => `<li>${esc(t)}</li>`).join('')}</ul></details>
+          </div></div>`).join('')}
+      </div>`;
+  }
+
+  function renderActions() {
+    const p = store.get(), s = allStats();
+    const doneCh = CHAPTERS.filter(c => { const t = chapterStats(c, p); return t.correct === t.total; }).length;
+    main.innerHTML = `
+      <div class="page-title"><h1>Actions · 学习进度</h1><span class="spacer"></span><button class="btn btn-sm btn-danger" id="resetAll" type="button">↺ 清空全部进度</button></div>
+      <div class="stat-cards">
+        <div class="stat-card"><div class="num">${s.answered}<span class="muted" style="font-size:14px"> / ${s.total}</span></div><div class="lbl">已作答题数</div></div>
+        <div class="stat-card"><div class="num">${pct(s.correct, s.answered)}%</div><div class="lbl">正确率</div></div>
+        <div class="stat-card"><div class="num">${doneCh}<span class="muted" style="font-size:14px"> / ${CHAPTERS.length}</span></div><div class="lbl">全对章节</div></div>
+      </div>
+      <div class="box">
+        <div class="box-header"><b>${CHAPTERS.length} 章节练习状态</b></div>
+        ${CHAPTERS.map(c => {
+          const t = chapterStats(c, p), rec = p[c.id] || {};
+          const icon = !t.answered ? I.idle : t.correct === t.total ? I.ok : t.answered < t.total ? I.pending : I.bad;
+          return `<div class="list-row">${icon}
+            <div class="lr-main">
+              <a class="lr-title" href="#/ch/${c.id}/quiz">第${c.id}章 ${esc(c.title)}</a>
+              <div class="lr-meta">已答 ${t.answered}/${t.total} · 答对 ${t.correct} · 负责人 ${esc(c.author)}</div>
+              <div class="progress" style="margin-top:6px;max-width:360px"><span style="width:${pct(t.correct, t.total)}%"></span></div>
+              <details><summary>查看每题结果</summary><ul class="run-steps">
+                ${c.quiz.map((q, i) => `<li>${!rec[i] ? I.idle : rec[i].ok ? I.ok : I.bad}<a href="#/ch/${c.id}/quiz/${i}">${i + 1}. ${esc(q.q)}</a></li>`).join('')}
+              </ul></details>
+            </div>
+            <a class="btn btn-sm" href="#/ch/${c.id}/quiz">${t.answered ? '继续' : '开始'}</a></div>`;
+        }).join('')}
+      </div>`;
+    $('#resetAll').onclick = () => { if (confirm('确定清空全部答题记录？')) { store.set({}); route(); } };
+  }
+
+  /* ---------- 搜索 ---------- */
+  const searchInput = $('#searchInput'), searchPop = $('#searchPop'), index = [];
+  CHAPTERS.forEach(c => c.sections.forEach((s, i) => s.subs.forEach((sb, j) => index.push({ c, i, j, title: sb.title, text: strip(sb.html) }))));
+  let searchSel = 0;
+  function doSearch() {
+    const q = searchInput.value.trim();
+    if (!q) { searchPop.hidden = true; return; }
+    const ql = q.toLowerCase();
+    const res = index.filter(x => (x.title + x.text + x.c.title).toLowerCase().includes(ql)).slice(0, 8);
+    searchSel = 0;
+    searchPop.innerHTML = res.length ? res.map((x, n) => `<a href="#/ch/${x.c.id}/${x.i}/${x.j}" class="${n === 0 ? 'on' : ''}">
+      <div class="s-title">${esc(x.title)}</div><div class="s-snip muted">第${x.c.id}章 · ${esc(x.text.slice(0, 50))}…</div></a>`).join('')
+      : `<div class="empty muted">没有找到「${esc(q)}」</div>`;
+    searchPop.hidden = false;
+  }
+  searchInput.oninput = doSearch; searchInput.onfocus = doSearch;
+  searchInput.onkeydown = e => {
+    const links = $$('a', searchPop);
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (links.length) { searchSel = (searchSel + (e.key === 'ArrowDown' ? 1 : -1) + links.length) % links.length; links.forEach((a, n) => a.classList.toggle('on', n === searchSel)); } }
+    else if (e.key === 'Enter' && links[searchSel]) { location.hash = links[searchSel].getAttribute('href'); searchPop.hidden = true; searchInput.blur(); }
+    else if (e.key === 'Escape') { searchPop.hidden = true; searchInput.blur(); }
+  };
+  searchPop.onclick = e => { if (e.target.closest('a')) searchPop.hidden = true; };
+  document.addEventListener('click', e => { if (!e.target.closest('.gh-search')) searchPop.hidden = true; });
+  document.addEventListener('keydown', e => { if (e.key === '/' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); searchInput.focus(); } });
+
+  /* ---------- 主题切换（默认 GitHub 深色，支持切换浅色） ---------- */
+  const applyTheme = t => {
+    document.documentElement.setAttribute('data-theme', t);
+    $('#themeBtn').textContent = t === 'dark' ? '☀️' : '🌙';
+    try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
+  };
+  applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
+  $('#themeBtn').onclick = () => applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+
+  function updateCounter() { const s = allStats(); $('#quizCounter').textContent = s.total - s.correct; }
+  function route() {
+    const parts = location.hash.replace(/^#\/?/, '').split('/').map(decodeURIComponent);
+    const view = parts[0] || 'code';
+    closeDrawer();
+    window.scrollTo(0, 0);
+    if (view === 'ch') renderChapter(+parts[1], parts[2], parts[3]);
+    else if (view === 'quiz') renderQuizHub();
+    else if (view === 'team') renderTeam();
+    else if (view === 'actions') renderActions();
+    else renderHome();
+    const tab = view === 'ch' ? (parts[2] === 'quiz' ? 'quiz' : 'code') : view;
+    $$('#repoNav a').forEach(a => a.classList.toggle('active', a.dataset.view === tab));
+    renderDrawer(view, view === 'ch' ? +parts[1] : null, parts[2]);
+    updateCounter();
+  }
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>
 </body>
 </html>
