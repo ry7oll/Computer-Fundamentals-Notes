@@ -617,9 +617,95 @@
       .qopts { grid-template-columns: 1fr; }
       .file-row .fname { width: auto; flex: 1; }
     }
+
+    /* ---------- 浅色模式两侧教材（纯装饰，不参与交互） ---------- */
+    .books { display: none; }
+    [data-theme="light"] .books {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      --bw: clamp(100px, calc((100vw - 1280px) / 2 - 28px), 250px);
+      --bh: calc(var(--bw) * 1.46);
+    }
+    /* 光晕跟着书一起淡入淡出，避免出现「有光没有书」的空档 */
+    [data-theme="light"] .books::before,
+    [data-theme="light"] .books::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 460px;
+      height: 560px;
+      transform: translateY(-50%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+    }
+    [data-theme="light"] .books::before {
+      left: -80px;
+      background: radial-gradient(closest-side, rgba(196, 72, 60, 0.15), transparent 72%);
+    }
+    [data-theme="light"] .books::after {
+      right: -80px;
+      background: radial-gradient(closest-side, rgba(38, 110, 190, 0.15), transparent 72%);
+    }
+    [data-theme="light"] .books.show-l::before { opacity: 1; }
+    [data-theme="light"] .books.show-r::after { opacity: 1; }
+    .books .book {
+      position: absolute;
+      top: 50%;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      opacity: 0;
+      -webkit-mask-image: linear-gradient(to bottom, #000 58%, rgba(0, 0, 0, 0.35) 86%, transparent 100%);
+      mask-image: linear-gradient(to bottom, #000 58%, rgba(0, 0, 0, 0.35) 86%, transparent 100%);
+      transition: opacity 0.42s ease, transform 0.62s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    /* 左：计算机组成原理；右：数字逻辑。默认是「退到画外 + 淡出」的状态 */
+    .books .l {
+      left: 20px;
+      width: calc(var(--bh) * 0.683);
+      height: var(--bh);
+      background-image: url("books/book-computer-organization.png");
+      transform: translateY(-50%) translateX(-30px) rotate(-15deg) scale(0.94);
+      filter: drop-shadow(0 16px 22px rgba(31, 35, 40, 0.26)) drop-shadow(0 3px 6px rgba(31, 35, 40, 0.12));
+    }
+    .books .r {
+      right: 20px;
+      width: calc(var(--bh) * 0.723);
+      height: var(--bh);
+      background-image: url("books/book-digital-logic.jpg");
+      transform: translateY(-50%) translateX(30px) rotate(15deg) scale(0.94);
+      border-radius: 3px 5px 5px 3px;
+      box-shadow:
+        inset 4px 0 8px -5px rgba(0, 0, 0, 0.55),
+        inset -2px 0 0 rgba(255, 255, 255, 0.22),
+        0 16px 22px rgba(31, 35, 40, 0.26),
+        0 3px 6px rgba(31, 35, 40, 0.12);
+    }
+    .books .book.is-on {
+      opacity: 1;
+      animation: bookFloat 10s ease-in-out infinite;
+    }
+    .books .l.is-on { transform: translateY(-50%) rotate(-7deg); }
+    .books .r.is-on { transform: translateY(-50%) rotate(7deg); animation-delay: -5s; }
+    @keyframes bookFloat {
+      0%, 100% { translate: 0 0; }
+      50% { translate: 0 -9px; }
+    }
+    @media (max-width: 1519px) { [data-theme="light"] .books { display: none; } }
+    @media print { .books { display: none !important; } }
   </style>
 </head>
 <body>
+  <!-- 浅色模式两侧教材（纯装饰；按当前所属教材只显示对应那一本） -->
+  <div class="books" aria-hidden="true">
+    <div class="book l"></div>
+    <div class="book r"></div>
+  </div>
+
   <!-- 弹出式侧边导航（点击左上角按钮弹出，背景虚化暗淡） -->
   <div class="backdrop" id="backdrop"></div>
   <aside class="drawer" id="drawer" aria-label="课程目录导航">
@@ -2329,6 +2415,20 @@ const CHAPTERS = [
   window.addEventListener('scroll', updateBackTop, { passive: true });
 
   function updateCounter() { const s = allStats(); $('#quizCounter').textContent = s.total - s.correct; }
+  /* ---------- 浅色模式两侧教材：只显示当前内容所属的那一本 ---------- */
+  function syncSideBooks(chapterId) {
+    const box = document.querySelector('.books');
+    if (!box) return;
+    const ch = chapterId ? CHAPTERS.find(c => c.id === chapterId) : null;
+    const book = ch ? ch.book : null;          // null = 首页/练习总览等，两本都显示
+    const l = box.querySelector('.l'), r = box.querySelector('.r');
+    const onL = book !== 'dl', onR = book !== 'co';      // 左 = 计算机组成原理，右 = 数字逻辑
+    box.classList.toggle('show-l', onL);
+    box.classList.toggle('show-r', onR);
+    if (l) l.classList.toggle('is-on', onL);
+    if (r) r.classList.toggle('is-on', onR);
+  }
+
   function route() {
     const parts = location.hash.replace(/^#\/?/, '').split('/').map(decodeURIComponent);
     const view = parts[0] || 'code';
@@ -2344,6 +2444,7 @@ const CHAPTERS = [
     $$('#repoNav a').forEach(a => a.classList.toggle('active', a.dataset.view === tab));
     renderDrawer(view, view === 'ch' ? +parts[1] : null, parts[2]);
     updateCounter();
+    syncSideBooks(view === 'ch' ? +parts[1] : null);
     applyLatinEverywhere();
     if (activeHighlight) applyGlobalHighlight(activeHighlight);
     updateBackTop();
