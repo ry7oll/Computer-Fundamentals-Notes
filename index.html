@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="icons/favicon.png" />
-  <title>计算机系统基础笔记 · 数字逻辑与开关理论课堂笔记</title>
+  <title>计算机系统基础笔记</title>
   <style>
     /* =========================================================
        GitHub Dark Dimmed（soft dark）#22272e & Light 主题变量
@@ -631,7 +631,7 @@ const TEAM = [
     ]
   },
   {
-    name: '成员C',
+    name: '慟',
     role: '第3章 时序逻辑 + 视觉样式统一',
     color: '#bf3989',
     tasks: [
@@ -641,7 +641,7 @@ const TEAM = [
     ]
   },
   {
-    name: '成员D',
+    name: 'yuyu914',
     role: '题库校对 + Actions 学习进度页',
     color: '#238636',
     tasks: [
@@ -688,7 +688,7 @@ const CHAPTERS = [
                   <button class="pick" data-info="<b>晶体管电平（正逻辑）</b>：高电平（如 +5 V / +3.3 V）= <code>1</code>，低电平（如 0 V）= <code>0</code>">⚡ 电压电平</button>
                   <button class="pick" data-info="<b>逻辑命题</b>：真（True）= <code>1</code>，假（False）= <code>0</code>">💡 逻辑真假</button>
                 </div>
-                <div class="picker-out muted">👆 点击查看开关量的不同物理实现。</div>
+                <div class="picker-out muted">↑ 点击查看开关量的不同物理实现。</div>
               </div>`
           },
           {
@@ -742,7 +742,7 @@ const CHAPTERS = [
                 </div>
               </div>
               <div class="widget" id="base-converter">
-                <b>🧮 实时进制转换器</b>
+                <b>实时进制转换器</b>
                 <div class="widget-row" style="margin-top:8px">
                   <input class="input" value="25" placeholder="输入非负整数" style="flex:1;min-width:140px;font-family:var(--mono)" />
                   <select class="input">
@@ -1357,9 +1357,9 @@ const CHAPTERS = [
           <div class="box">
             <div class="box-header"><span class="ico ic-chapter" aria-hidden="true"></span><b>README.md</b></div>
             <article class="markdown-body">
-              <h1>💻 《数字逻辑 / 开关理论》课堂笔记</h1>
+              <h1>《数字逻辑 / 开关理论》课堂笔记</h1>
               <p class="lead">点击左上角 <b>☰</b> 按钮可从左侧弹出高亮章节目录（背景自动虚化暗淡，方便专注选章）。页面支持术语悬停提示、例题折叠解析、选项卡、逻辑门与卡诺图交互、以及课后练习即时判题。</p>
-              <h2>📚 课程章节结构</h2>
+              <h2>课程章节结构</h2>
               <table><thead><tr><th>章节</th><th>核心节次</th><th>小节数</th><th>负责人</th></tr></thead><tbody>
                 ${CHAPTERS.map(c => `<tr><td><a href="#/ch/${c.id}">第${c.id}章 ${esc(c.title)}</a></td><td>${c.sections.map(x => esc(x.title)).join('、')}</td><td>${c.sections.reduce((m, s) => m + s.subs.length, 0)}</td><td>${avatar(c.author)} ${esc(c.author)}</td></tr>`).join('')}
               </tbody></table>
