@@ -84,7 +84,7 @@
     }
 
     * { box-sizing: border-box; }
-    html { scroll-padding-top: 20px; }
+    html { scroll-padding-top: 76px; }
     body {
       margin: 0;
       font-family: var(--font);
@@ -164,8 +164,11 @@
       user-select: none;
     }
 
-    /* ---------- 顶部全局 Header（对齐 GitHub 截图） ---------- */
+    /* ---------- 顶部全局 Header（固定在顶部，滑动时也可搜索） ---------- */
     .gh-header {
+      position: sticky;
+      top: 0;
+      z-index: 70;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -214,18 +217,20 @@
     }
     .search-pop {
       position: absolute; top: calc(100% + 6px); left: 0; right: 0;
-      background: var(--bg-subtle); color: var(--fg);
+      background: var(--bg); color: var(--fg);
       border: 1px solid var(--border); border-radius: var(--radius);
-      box-shadow: var(--shadow); z-index: 60; max-height: 420px; overflow: auto;
+      box-shadow: var(--shadow); z-index: 80; max-height: 420px; overflow: auto;
+      padding: 4px;
     }
-    .search-pop a { display: block; padding: 8px 12px; color: var(--fg); border-bottom: 1px solid var(--border-muted); }
-    .search-pop a:last-child { border-bottom: 0; }
-    .search-pop a:hover, .search-pop a.on { background: var(--accent-emphasis); color: #fff; text-decoration: none; }
-    .search-pop a:hover .muted, .search-pop a.on .muted { color: #e6edf3; }
+    .search-pop a { display: block; padding: 8px 10px; color: var(--fg); border-radius: var(--radius); transition: background 0.12s; }
+    .search-pop a + a { margin-top: 2px; }
+    .search-pop a:hover, .search-pop a.on { background: var(--bg-hover); color: var(--fg); text-decoration: none; }
+    .search-pop a:hover .muted, .search-pop a.on .muted { color: var(--fg-muted); }
     .search-pop .s-title { font-weight: 600; }
     .search-pop .s-snip { font-size: 12px; }
     .search-pop mark { background: var(--attention-subtle); color: var(--attention); border-radius: 2px; padding: 0 2px; }
     .search-pop .empty { padding: 12px; }
+    mark.search-hl { background: #fff3a0; color: #1f2328; border-radius: 2px; padding: 0 1px; }
 
     /* ---------- 仓库标题栏 + 导航 Tabs ---------- */
     .repo-head {
@@ -562,6 +567,31 @@
     .run-steps li a { color: var(--fg); }
 
     .gh-footer { border-top: 1px solid var(--border); padding: 20px 24px; text-align: center; color: var(--fg-muted); font-size: 12px; margin-top: auto; }
+    .back-top {
+      position: fixed;
+      right: 28px;
+      bottom: 28px;
+      z-index: 65;
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-subtle);
+      color: var(--fg);
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 0.2s ease, transform 0.2s ease, background 0.15s ease;
+    }
+    .back-top.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .back-top:hover { background: var(--bg-hover); border-color: var(--fg-muted); }
+    .note-sec, .sub-block, .qcard { scroll-margin-top: 76px; }
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes fadeDown { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
@@ -632,6 +662,7 @@
     <footer class="gh-footer">
       © 2026 计算机系统基础笔记-第一阶段
     </footer>
+    <button class="back-top" id="backTopBtn" type="button" title="回到顶部" aria-label="回到顶部">↑</button>
   </div>
 
 <script>
@@ -1449,7 +1480,7 @@ const CHAPTERS = [
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const strip = html => String(html).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const strip = html => String(html).replace(/<[^>]+>/g, ' ').replace(/&(nbsp|emsp);/g, ' ').replace(/\s+/g, ' ').trim();
   const store = {
     get() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; } },
     set(p) { try { localStorage.setItem(STORE_KEY, JSON.stringify(p)); } catch (e) {} }
@@ -1529,8 +1560,7 @@ const CHAPTERS = [
   drawerBody.addEventListener('click', e => {
     const row = e.target.closest('.tree-row');
     if (row) {
-      if (e.target.closest('[data-caret]')) { row.parentElement.classList.toggle('open'); return; }
-      if (row.dataset.href) { location.hash = row.dataset.href; closeDrawer(); }
+      row.parentElement.classList.toggle('open');
       return;
     }
     if (e.target.closest('a')) closeDrawer();
@@ -1847,29 +1877,111 @@ const CHAPTERS = [
     $('#resetAll').onclick = () => { if (confirm('确定清空全部答题记录？')) { store.set({}); lastStudy.clear(); route(); } };
   }
 
-  /* ---------- 搜索 ---------- */
+  /* ---------- 搜索 & 跳转后全局黄色高亮 ---------- */
   const searchInput = $('#searchInput'), searchPop = $('#searchPop'), index = [];
   CHAPTERS.forEach(c => c.sections.forEach((s, i) => s.subs.forEach((sb, j) => index.push({ c, i, j, title: sb.title, text: strip(sb.html) }))));
-  let searchSel = 0;
+  let searchSel = -1;
+  let activeHighlight = '';
+
+  function clearGlobalHighlight() {
+    $$('mark.search-hl', main).forEach(m => {
+      const parent = m.parentNode;
+      if (!parent) return;
+      parent.replaceChild(document.createTextNode(m.textContent), m);
+      parent.normalize();
+    });
+  }
+
+  function applyGlobalHighlight(term) {
+    clearGlobalHighlight();
+    if (!term) return;
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(escaped, 'gi');
+    const walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT, null);
+    const nodes = [];
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      const p = n.parentElement;
+      if (!p || /^(SCRIPT|STYLE|NOSCRIPT|INPUT|TEXTAREA|SELECT|OPTION|BUTTON)$/.test(p.tagName) || p.closest('mark.search-hl')) continue;
+      if (re.test(n.nodeValue)) { re.lastIndex = 0; nodes.push(n); }
+    }
+    nodes.forEach(node => {
+      const text = node.nodeValue;
+      const frag = document.createDocumentFragment();
+      let last = 0, m;
+      re.lastIndex = 0;
+      while ((m = re.exec(text))) {
+        if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+        const mark = document.createElement('mark');
+        mark.className = 'search-hl';
+        mark.setAttribute('data-no-latin', '');
+        mark.textContent = m[0];
+        frag.appendChild(mark);
+        last = m.index + m[0].length;
+      }
+      if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+
   function doSearch() {
     const q = searchInput.value.trim();
     if (!q) { searchPop.hidden = true; return; }
     const ql = q.toLowerCase();
     const res = index.filter(x => (x.title + x.text + x.c.title).toLowerCase().includes(ql)).slice(0, 8);
-    searchSel = 0;
-    searchPop.innerHTML = res.length ? res.map((x, n) => `<a href="#/ch/${x.c.id}/${x.i}/${x.j}" class="${n === 0 ? 'on' : ''}">
+    searchSel = -1;
+    searchPop.innerHTML = res.length ? res.map(x => `<a href="#/ch/${x.c.id}/${x.i}/${x.j}">
       <div class="s-title">${esc(x.title)}</div><div class="s-snip muted">第${x.c.id}章 · ${esc(x.text.slice(0, 50))}…</div></a>`).join('')
       : `<div class="empty muted">没有找到「${esc(q)}」</div>`;
     searchPop.hidden = false;
   }
-  searchInput.oninput = doSearch; searchInput.onfocus = doSearch;
+
+  function jumpFromSearch(href) {
+    const term = searchInput.value.trim();
+    activeHighlight = term;
+    searchPop.hidden = true;
+    searchInput.blur();
+    if (location.hash === href) {
+      applyGlobalHighlight(activeHighlight);
+      const parts = href.replace(/^#\/?/, '').split('/');
+      const t = parts[3] !== undefined ? document.getElementById(`sub-${parts[2]}-${parts[3]}`) : document.getElementById(`sec-${parts[2]}`);
+      if (t) t.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      location.hash = href;
+    }
+  }
+
+  searchInput.oninput = () => {
+    if (activeHighlight) {
+      activeHighlight = '';
+      clearGlobalHighlight();
+    }
+    doSearch();
+  };
+  searchInput.onfocus = doSearch;
   searchInput.onkeydown = e => {
     const links = $$('a', searchPop);
-    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (links.length) { searchSel = (searchSel + (e.key === 'ArrowDown' ? 1 : -1) + links.length) % links.length; links.forEach((a, n) => a.classList.toggle('on', n === searchSel)); } }
-    else if (e.key === 'Enter' && links[searchSel]) { location.hash = links[searchSel].getAttribute('href'); searchPop.hidden = true; searchInput.blur(); }
-    else if (e.key === 'Escape') { searchPop.hidden = true; searchInput.blur(); }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!links.length) return;
+      if (searchSel === -1) searchSel = e.key === 'ArrowDown' ? 0 : links.length - 1;
+      else searchSel = (searchSel + (e.key === 'ArrowDown' ? 1 : -1) + links.length) % links.length;
+      links.forEach((a, n) => a.classList.toggle('on', n === searchSel));
+    } else if (e.key === 'Enter' && links.length) {
+      e.preventDefault();
+      const target = links[searchSel >= 0 ? searchSel : 0];
+      if (target) jumpFromSearch(target.getAttribute('href'));
+    } else if (e.key === 'Escape') {
+      searchPop.hidden = true;
+      searchInput.blur();
+    }
   };
-  searchPop.onclick = e => { if (e.target.closest('a')) searchPop.hidden = true; };
+  searchPop.onclick = e => {
+    const a = e.target.closest('a');
+    if (a) {
+      e.preventDefault();
+      jumpFromSearch(a.getAttribute('href'));
+    }
+  };
   document.addEventListener('click', e => { if (!e.target.closest('.gh-search')) searchPop.hidden = true; });
   document.addEventListener('keydown', e => { if (e.key === '/' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); searchInput.focus(); } });
 
@@ -1888,7 +2000,7 @@ const CHAPTERS = [
   const TRIM_TAIL = /[._\-+/=<>\u2264\u2265\u2248\u2260\u00b7\u00d7\u00f7^~*%\u2030\u00b0:;,&@#|]+$/;
   /* 数字/英文紧贴这些字符时（「第1章」「1、2」「A的」）保持中文字体 */
   const CJK_NEAR = /[\u3001\u3002\u3008-\u3011\u3014-\u301f\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\ufe30-\ufe4f\uff01\uff0c\uff1a\uff1b\uff1f\uff5e]/;
-  const LATIN_SKIP_SEL = 'code, pre, kbd, samp, .lat, .kmap, .bit-btn, .mono, [data-no-latin]';
+  const LATIN_SKIP_SEL = 'code, pre, kbd, samp, .lat, .kmap, .bit-btn, .mono, .search-hl, [data-no-latin]';
   const LATIN_SKIP_TAGS = /^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA|INPUT|TITLE)$/;
 
   function wrapLatin(root) {
@@ -1938,10 +2050,20 @@ const CHAPTERS = [
     if (sp) wrapLatin(sp);
   }
 
+  /* ---------- 回到顶部按钮（笔记正文 & 课后练习非顶部时显示） ---------- */
+  const backTopBtn = $('#backTopBtn');
+  let currentView = 'code';
+  function updateBackTop() {
+    backTopBtn.classList.toggle('show', currentView === 'ch' && window.scrollY > 200);
+  }
+  backTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.addEventListener('scroll', updateBackTop, { passive: true });
+
   function updateCounter() { const s = allStats(); $('#quizCounter').textContent = s.total - s.correct; }
   function route() {
     const parts = location.hash.replace(/^#\/?/, '').split('/').map(decodeURIComponent);
     const view = parts[0] || 'code';
+    currentView = view;
     closeDrawer();
     window.scrollTo(0, 0);
     if (view === 'ch') renderChapter(+parts[1], parts[2], parts[3]);
@@ -1954,6 +2076,8 @@ const CHAPTERS = [
     renderDrawer(view, view === 'ch' ? +parts[1] : null, parts[2]);
     updateCounter();
     applyLatinEverywhere();
+    if (activeHighlight) applyGlobalHighlight(activeHighlight);
+    updateBackTop();
   }
   /* 动态渲染出来的内容（判题反馈、进制转换、真值表、搜索）也补齐 Droid Sans */
   let latinRaf = 0;
