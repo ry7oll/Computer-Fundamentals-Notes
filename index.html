@@ -79,7 +79,8 @@
     .muted { color: var(--fg-muted); }
     .spacer { flex: 1; }
     .ic { width: 16px; height: 16px; flex: none; vertical-align: text-bottom; }
-    .ov { text-decoration: overline; }
+    .ov { display: inline-block; border-top: 1.25px solid currentColor; padding-top: 1px; line-height: 1.15; margin: 0 1px; }
+    .ov > .ov { margin-top: 1px; }
 
     /* ---------- 位图图标（icons/ 下的同名资源；xxx_暗 用于深色主题） ---------- */
     .ico {
@@ -665,9 +666,9 @@ const CHAPTERS = [
     id: 1,
     title: '开关理论基础',
     author: 'ry7oll',
-    updated: '2026-11-18',
-    summary: '二进制系统、数制码制、逻辑函数、布尔代数、卡诺图与数字集成电路',
-    intro: '本章从连续量与离散量的区别出发，建立二进制开关理论基础，学习数制码制、逻辑函数描述工具、布尔代数化简、卡诺图化简及数字集成电路基础。',
+    updated: '2026-11-21',
+    summary: '二进制系统、数制与码制、逻辑函数、布尔代数、卡诺图与数字集成电路',
+    intro: '本章学习数字逻辑的开关理论基础，涵盖二进制系统与数字波形、数制与常用编码、逻辑函数及其描述工具、布尔代数基本定律与化简、卡诺图化简及数字集成电路基础。',
     sections: [
       {
         title: '1.1 二进制系统',
@@ -675,35 +676,33 @@ const CHAPTERS = [
           {
             title: '1.1.1 连续量和离散量',
             html: `
-              <p>自然界中的物理量按变化方式分为两类：</p>
               <ul>
-                <li><b>连续量（模拟量）</b>：在时间和数值上连续变化，可取无限多个值（如温度、电压、声音波形）。</li>
-                <li><b>离散量（数字量）</b>：在时间上或数值上不连续，只能取有限个离散值（如计数人数、二进制比特 <code>0</code> 和 <code>1</code>）。</li>
+                <li><b>连续量（模拟量）</b>：数值随时间连续变化，可无限细分。例：温度、声音、连续变化的电压。</li>
+                <li><b>离散量（数字量）</b>：数值离散、不连续，只能取有限个/可数的值。</li>
               </ul>
-              <div class="callout"><b>为什么使用数字系统？</b>抗干扰能力强、易于存储与加密、可用统一电路大规模集成处理。</div>`
+              <div class="callout"><b>核心区别</b>连续量处处有值，离散量只在离散点上取值。</div>`
           },
           {
             title: '1.1.2 开关量',
             html: `
-              <p><span class="term" data-tip="只有两种互斥状态（如开/关、高电平/低电平、真/假）的离散量">开关量</span>是只有两个取值的最简单离散量，通常记为 <code>0</code> 和 <code>1</code>（并不代表数值大小，而是两种逻辑状态）。</p>
-              <div class="picker">
-                <div class="pick-row">
-                  <button class="pick" data-info="<b>机械开关</b>：闭合 = <code>1</code>，断开 = <code>0</code>">🔌 机械开关</button>
-                  <button class="pick" data-info="<b>晶体管电平（正逻辑）</b>：高电平（如 +5 V / +3.3 V）= <code>1</code>，低电平（如 0 V）= <code>0</code>">⚡ 电压电平</button>
-                  <button class="pick" data-info="<b>逻辑命题</b>：真（True）= <code>1</code>，假（False）= <code>0</code>">💡 逻辑真假</button>
-                </div>
-                <div class="picker-out muted">↑ 点击查看开关量的不同物理实现。</div>
-              </div>`
+              <p>只有两种状态的物理量称为<span class="term" data-tip="只有两种互斥状态的离散量，通常用 0 和 1 表示">开关量</span>。</p>
+              <p>两种不同状态可以用<b>高电平（H）</b>或<b>低电平（L）</b>来表示，这种二状态系统叫<b>二进制系统</b>。</p>`
           },
           {
             title: '1.1.3 数字波形',
             html: `
-              <p>数字波形是逻辑电平随时间变化的矩形脉冲序列，常见参数如下：</p>
-              <ul>
-                <li><b>脉冲幅度 <i>V<sub>m</sub></i></b>：高电平与低电平之差；<b>周期 <i>T</i></b> 与 <b>频率 <i>f</i> = 1/<i>T</i></b>。</li>
-                <li><b>脉冲宽度 <i>t<sub>w</sub></i></b>：高电平持续时间；<span class="term" data-tip="占空比 q = tw / T × 100%，描述一个周期内高电平所占比例">占空比</span> <i>q</i> = <i>t<sub>w</sub></i> / <i>T</i>。</li>
-                <li><b>上升时间 <i>t<sub>r</sub></i> / 下降时间 <i>t<sub>f</sub></i></b>：电平从 10% 升到 90%（或 90% 降到 10%）的时间。</li>
-              </ul>`
+              <p><b>数字波形</b>：描述数字信号（<code>0/1</code> 电平）随时间变化的图形。</p>
+              <table>
+                <thead><tr><th>主要参数</th><th>符号</th><th>含义 / 公式</th></tr></thead>
+                <tbody>
+                  <tr><td>上升时间</td><td><i>t<sub>r</sub></i></td><td>脉冲幅度从 10% 到 90% 的时间</td></tr>
+                  <tr><td>下降时间</td><td><i>t<sub>f</sub></i></td><td>脉冲幅度从 90% 到 10% 的时间</td></tr>
+                  <tr><td>周期</td><td><i>T</i></td><td>相邻两个同向边沿之间的时间</td></tr>
+                  <tr><td>频率</td><td><i>f</i></td><td><i>f</i> = 1 / <i>T</i></td></tr>
+                  <tr><td>脉冲宽度</td><td><i>t<sub>w</sub></i></td><td>一个脉冲持续的时间（高电平宽度）</td></tr>
+                  <tr><td>占空比</td><td><i>D</i></td><td><i>D</i> = <i>t<sub>w</sub></i> / <i>T</i> × 100%</td></tr>
+                </tbody>
+              </table>`
           }
         ]
       },
@@ -713,14 +712,18 @@ const CHAPTERS = [
           {
             title: '1.2.1 进位计数制',
             html: `
-              <p>进位计数制由<span class="term" data-tip="每位允许使用的数码个数，如二进制基数为 2">基数</span>和<span class="term" data-tip="第 i 位上的 1 所代表的数值大小，等于基数的 i 次方">位权</span>确定：</p>
+              <ul>
+                <li><b>基数 <i>R</i></b>：进制数，如二进制 <i>R</i> = 2，十进制 <i>R</i> = 10。</li>
+                <li><b>位权 <i>R<sup>i</sup></i></b>：第 <i>i</i> 位的权重。</li>
+                <li><b>任一 <i>R</i> 进制数按位权展开</b>：(<i>S</i>)<sub><i>R</i></sub> = ∑ <i>d<sub>i</sub></i> · <i>R<sup>i</sup></i></li>
+              </ul>
               <table>
-                <thead><tr><th>数制</th><th>基数</th><th>数码</th><th>进位规则</th><th>后缀</th></tr></thead>
+                <thead><tr><th>常用进制</th><th>标识</th><th>基数</th><th>数码</th></tr></thead>
                 <tbody>
-                  <tr><td>二进制</td><td>2</td><td>0, 1</td><td>逢二进一</td><td>B</td></tr>
-                  <tr><td>八进制</td><td>8</td><td>0 ~ 7</td><td>逢八进一</td><td>O / Q</td></tr>
-                  <tr><td>十进制</td><td>10</td><td>0 ~ 9</td><td>逢十进一</td><td>D</td></tr>
-                  <tr><td>十六进制</td><td>16</td><td>0 ~ 9, A ~ F</td><td>逢十六进一</td><td>H</td></tr>
+                  <tr><td>二进制</td><td>B</td><td>2</td><td>0, 1</td></tr>
+                  <tr><td>八进制</td><td>O</td><td>8</td><td>0 ~ 7</td></tr>
+                  <tr><td>十进制</td><td>D</td><td>10</td><td>0 ~ 9</td></tr>
+                  <tr><td>十六进制</td><td>H</td><td>16</td><td>0 ~ 9, A ~ F</td></tr>
                 </tbody>
               </table>`
           },
@@ -728,32 +731,31 @@ const CHAPTERS = [
             title: '1.2.2 进位计数制的相互转换',
             html: `
               <div class="tabs">
-                <div data-tab="R 进制 → 十进制">
-                  <p><b>按权展开求和</b>：(1101.1)<sub>2</sub> = 1×8 + 1×4 + 0×2 + 1×1 + 1×0.5 = <b>13.5</b>。</p>
+                <div data-tab="R 进制转十进制">
+                  <p><b>按位权展开求和</b>。</p>
+                  <p>例：<code>1011.01B</code> = 8 + 0 + 2 + 1 + 0 + 0.25 = <b>11.25D</b></p>
                 </div>
-                <div data-tab="十进制 → 二进制">
-                  <p><b>整数除 2 取余逆序排；小数乘 2 取整顺序排。</b></p>
-                  <ol class="steps">
-                    <li>25 ÷ 2 = 12 …… 余 <b>1</b></li>
-                    <li>12 ÷ 2 = 6 …… 余 <b>0</b></li>
-                    <li>6 ÷ 2 = 3 …… 余 <b>0</b></li>
-                    <li>3 ÷ 2 = 1 …… 余 <b>1</b></li>
-                    <li>1 ÷ 2 = 0 …… 余 <b>1</b> ⇒ (25)<sub>10</sub> = <b>(11001)<sub>2</sub></b> ✅</li>
-                  </ol>
+                <div data-tab="十进制转 R 进制">
+                  <p><b>整数部分</b>：除 <i>R</i> 取余，逆序排列；<br><b>小数部分</b>：乘 <i>R</i> 取整，顺序排列。</p>
+                  <div class="callout warn"><b>注意</b>十进制小数转二进制可能无限循环，需按精度取近似。</div>
                 </div>
-                <div data-tab="二 ↔ 八 / 十六">
-                  <p><b>三位一组</b>转八进制，<b>四位一组</b>转十六进制（以小数点为界向两侧补 0）。</p>
+                <div data-tab="二 / 八 / 十六进制互转">
+                  <ul>
+                    <li><b>二转八</b>：以小数点为界，每 <b>3 位</b>一组（不足 3 位的补 0）。</li>
+                    <li><b>二转十六</b>：二进制每 <b>4 位</b>一组代表一位十六进制数。</li>
+                    <li><b>八 / 十六进制互转</b>：先转二进制再分组。</li>
+                  </ul>
                 </div>
               </div>
               <div class="widget" id="base-converter">
-                <b>实时进制转换器</b>
+                <b>🧮 实时进制转换器</b>
                 <div class="widget-row" style="margin-top:8px">
                   <input class="input" value="25" placeholder="输入非负整数" style="flex:1;min-width:140px;font-family:var(--mono)" />
                   <select class="input">
-                    <option value="10" selected>十进制</option>
-                    <option value="2">二进制</option>
-                    <option value="8">八进制</option>
-                    <option value="16">十六进制</option>
+                    <option value="10" selected>十进制 (D)</option>
+                    <option value="2">二进制 (B)</option>
+                    <option value="8">八进制 (O)</option>
+                    <option value="16">十六进制 (H)</option>
                   </select>
                 </div>
                 <div class="conv-out"></div>
@@ -762,11 +764,11 @@ const CHAPTERS = [
           {
             title: '1.2.3 二进制编码',
             html: `
-              <p>用二进制代码表示十进制数字、字符或特定信息称为编码：</p>
+              <p><b>二-十进制码（BCD 码）与常用编码</b>：</p>
               <ul>
-                <li><b>8421 BCD 码</b>：有权码，4 位二进制表示 1 位十进制（<code>0000</code>~<code>1001</code>，<code>1010</code>~<code>1111</code> 为伪码）。</li>
-                <li><b>格雷码（Gray Code）</b>：无权码，任意两个相邻代码之间<b>只有 1 位不同</b>，可消除状态切换时的过渡噪声。</li>
-                <li><b>ASCII 码</b>：7 位二进制表示 128 个常用字符（<code>'0'=48</code>, <code>'A'=65</code>, <code>'a'=97</code>）。</li>
+                <li><b>8421 码</b>：有权码，4 位表示 1 位十进制，<code>1010 ~ 1111</code> 不可能出现。</li>
+                <li><b>余 3 码</b>：无权码，8421 码 + <code>0011</code>；是<b>自补码</b>（对 9 的补 = 逐位取反）。</li>
+                <li><b>格雷码</b>：无权码，相邻码只有一位不同（循环码 / 单位距离码），用于减少状态转换时的误码。</li>
               </ul>`
           }
         ]
@@ -777,17 +779,46 @@ const CHAPTERS = [
           {
             title: '1.3.1 逻辑函数的基本概念',
             html: `
-              <p>若输出逻辑变量 <i>Y</i> 的取值唯一取决于输入逻辑变量 <i>A, B, C, …</i> 的组合，则称 <i>Y = F(A, B, C, …)</i> 为<b>逻辑函数</b>。输入与输出均只取 <code>0</code> 或 <code>1</code>。</p>`
+              <ul>
+                <li>数字电路又称作<b>逻辑电路</b>，是一种开关电路，常用晶体管的“导通”和“截止”来实现，并用二元常量 <code>0</code> 和 <code>1</code> 表示。</li>
+                <li>逻辑函数 <i>F</i> 描述输入逻辑变量与输出之间的因果关系：<i>F</i> = <i>f</i>(<i>A</i><sub>1</sub>, <i>A</i><sub>2</sub>, …, <i>A<sub>n</sub></i>)。</li>
+                <li>变量和函数都只取 <code>0</code> 或 <code>1</code>，没有中间值；<i>n</i> 个输入变量共有 <b>2<sup><i>n</i></sup></b> 种取值组合。</li>
+                <li><b>逻辑函数相等</b>：真值表完全相同。</li>
+              </ul>`
           },
           {
             title: '1.3.2 逻辑函数的描述工具',
             html: `
-              <p>描述同一逻辑函数的五种常见工具：<b>真值表</b>、<b>逻辑表达式</b>、<b>逻辑图</b>、<b>波形图</b>、<b>卡诺图</b>，它们之间可以相互转换。</p>`
+              <p>同一逻辑函数可有<b>六种等价描述</b>：</p>
+              <ol>
+                <li><b>布尔代数</b>：按一定逻辑规律进行运算的代数，只有 0、1 两种取值。</li>
+                <li><b>真值表</b>：列出所有输入组合及对应输出，最直观。</li>
+                <li><b>逻辑图</b>：用逻辑门符号连接表示。</li>
+                <li><b>卡诺图</b>：方格图，用于化简。</li>
+                <li><b>波形图</b>：按时间画出输入/输出电平。</li>
+                <li><b>硬件描述语言（HDL）</b>：采用软件方法来设计数字硬件。</li>
+              </ol>`
           },
           {
             title: '1.3.3 基本逻辑运算',
             html: `
-              <p>三种基本运算为<b>与（AND）</b>、<b>或（OR）</b>、<b>非（NOT）</b>，由此复合出与非、或非、异或（<i>A</i> ⊕ <i>B</i>）、同或（<i>A</i> ⊙ <i>B</i>）。</p>
+              <div class="tabs">
+                <div data-tab="三种基本运算">
+                  <ul>
+                    <li><b>与运算（逻辑乘）</b>：<i>F</i> = <i>A</i> · <i>B</i> = <i>AB</i></li>
+                    <li><b>或运算（逻辑加）</b>：<i>F</i> = <i>A</i> + <i>B</i></li>
+                    <li><b>非运算</b>：<i>F</i> = <span class="ov"><i>A</i></span></li>
+                  </ul>
+                </div>
+                <div data-tab="复合逻辑运算">
+                  <ul>
+                    <li><b>与非</b>：<i>F</i> = <span class="ov"><i>A · B</i></span></li>
+                    <li><b>或非</b>：<i>F</i> = <span class="ov"><i>A + B</i></span></li>
+                    <li><b>异或</b>：<i>F</i> = <i>A</i> ⊕ <i>B</i> = <span class="ov"><i>A</i></span><i>B</i> + <i>A</i><span class="ov"><i>B</i></span></li>
+                    <li><b>同或</b>：<i>F</i> = <i>A</i> ⊙ <i>B</i> = <i>AB</i> + <span class="ov"><i>A</i></span><span class="ov"><i>B</i></span></li>
+                  </ul>
+                </div>
+              </div>
               <div class="widget" id="gate-sim">
                 <b>⚡ 逻辑门交互模拟器（点击切换输入电平）</b>
                 <div class="widget-row" style="margin-top:8px">
@@ -801,9 +832,18 @@ const CHAPTERS = [
             title: '1.3.4 正逻辑、负逻辑、三态门',
             html: `
               <ul>
-                <li><b>正逻辑</b>：高电平 = 1，低电平 = 0；<b>负逻辑</b>：低电平 = 1，高电平 = 0。同一物理电路在正/负逻辑下功能互为对偶（正逻辑与门 = 负逻辑或门）。</li>
-                <li><b>三态门（TSL）</b>：输出除 <code>0</code>、<code>1</code> 外还有<b>高阻态（Z）</b>，常用于多设备共享总线，避免输出冲突。</li>
-              </ul>`
+                <li><b>正逻辑</b>：规定高电平为 <code>1</code>、低电平为 <code>0</code>。</li>
+                <li><b>负逻辑</b>：规定高电平为 <code>0</code>、低电平为 <code>1</code>。</li>
+              </ul>
+              <div class="picker">
+                <div class="pick-row">
+                  <button class="pick" data-info="正逻辑的<b>「或」</b> = 负逻辑的<b>「与」</b>；正逻辑的<b>「与」</b> = 负逻辑的<b>「或」</b>。">与 / 或互换</button>
+                  <button class="pick" data-info="正逻辑的<b>「与非」</b> = 负逻辑的<b>「或非」</b>；正逻辑的<b>「或非」</b> = 负逻辑的<b>「与非」</b>。">与非 / 或非互换</button>
+                  <button class="pick" data-info="正逻辑的<b>「异或」</b> = 负逻辑的<b>「同或」</b>；正逻辑的<b>「同或」</b> = 负逻辑的<b>「异或」</b>。">异或 / 同或互换</button>
+                </div>
+                <div class="picker-out muted">同一物理电路，正/负逻辑规定不同，实现的逻辑功能不同。👆 点击查看对应关系。</div>
+              </div>
+              <div class="callout"><b>三态门</b>输出有三种状态：<b>高电平 1</b>、<b>低电平 0</b>、<b>高阻态</b>。高阻态相当于输出与后面连接的电路断开。</div>`
           }
         ]
       },
@@ -814,14 +854,14 @@ const CHAPTERS = [
             title: '1.4.1 布尔代数的基本定律',
             html: `
               <table>
-                <thead><tr><th>定律名称</th><th>与运算形式</th><th>或运算形式</th></tr></thead>
+                <thead><tr><th>定律</th><th>公式</th></tr></thead>
                 <tbody>
-                  <tr><td>交换律</td><td><i>A · B = B · A</i></td><td><i>A + B = B + A</i></td></tr>
-                  <tr><td>结合律</td><td>(<i>A · B</i>)<i>C</i> = <i>A</i>(<i>B · C</i>)</td><td>(<i>A + B</i>) + <i>C</i> = <i>A</i> + (<i>B + C</i>)</td></tr>
-                  <tr><td>分配律</td><td><i>A</i>(<i>B + C</i>) = <i>AB + AC</i></td><td><i>A + BC</i> = (<i>A + B</i>)(<i>A + C</i>)</td></tr>
-                  <tr><td>重叠律 / 互补律</td><td><i>A · A = A</i>，<i>A · <span class="ov">A</span></i> = 0</td><td><i>A + A = A</i>，<i>A + <span class="ov">A</span></i> = 1</td></tr>
-                  <tr><td>吸收律</td><td><i>A + AB = A</i></td><td><i>A + <span class="ov">A</span>B = A + B</i></td></tr>
-                  <tr><td>狄摩根定律（反演律）</td><td><span class="ov"><i>A · B</i></span> = <span class="ov"><i>A</i></span> + <span class="ov"><i>B</i></span></td><td><span class="ov"><i>A + B</i></span> = <span class="ov"><i>A</i></span> · <span class="ov"><i>B</i></span></td></tr>
+                  <tr><td>基本律</td><td><i>A</i>·0 = 0 &nbsp; <i>A</i>·1 = <i>A</i> &nbsp; <i>A</i>+0 = <i>A</i> &nbsp; <i>A</i>+1 = 1<br><i>A</i>·<i>A</i> = <i>A</i> &nbsp; <i>A</i>+<i>A</i> = <i>A</i> &nbsp; <i>A</i>·<span class="ov"><i>A</i></span> = 0 &nbsp; <i>A</i>+<span class="ov"><i>A</i></span> = 1 &nbsp; <span class="ov"><span class="ov"><i>A</i></span></span> = <i>A</i></td></tr>
+                  <tr><td>交换律</td><td><i>AB</i> = <i>BA</i> &emsp; <i>A</i> + <i>B</i> = <i>B</i> + <i>A</i></td></tr>
+                  <tr><td>结合律</td><td>(<i>AB</i>)<i>C</i> = <i>A</i>(<i>BC</i>) &emsp; (<i>A</i> + <i>B</i>) + <i>C</i> = <i>A</i> + (<i>B</i> + <i>C</i>)</td></tr>
+                  <tr><td>分配律</td><td><i>A</i>(<i>B</i> + <i>C</i>) = <i>AB</i> + <i>AC</i> &emsp; <i>A</i> + <i>BC</i> = (<i>A</i> + <i>B</i>)(<i>A</i> + <i>C</i>)</td></tr>
+                  <tr><td>吸收律</td><td><i>A</i> + <i>AB</i> = <i>A</i> &emsp; <i>A</i>(<i>A</i> + <i>B</i>) = <i>A</i><br><i>A</i> + <span class="ov"><i>A</i></span><i>B</i> = <i>A</i> + <i>B</i> &emsp; <i>A</i>(<span class="ov"><i>A</i></span> + <i>B</i>) = <i>AB</i></td></tr>
+                  <tr><td>狄摩根定理</td><td><span class="ov"><i>AB</i></span> = <span class="ov"><i>A</i></span> + <span class="ov"><i>B</i></span> &emsp; <span class="ov"><i>A + B</i></span> = <span class="ov"><i>A</i></span> · <span class="ov"><i>B</i></span></td></tr>
                 </tbody>
               </table>`
           },
@@ -829,19 +869,26 @@ const CHAPTERS = [
             title: '1.4.2 布尔代数运算的基本规则',
             html: `
               <ul>
-                <li><b>代入规则</b>：等式中所有出现同一变量的地方，用同一逻辑函数替换，等式仍成立。</li>
-                <li><b>反演规则</b>：将「·」换「+」，「+」换「·」，<code>0</code> 换 <code>1</code>，<code>1</code> 换 <code>0</code>，原变量换反变量、反变量换原变量，即得反函数 <span class="ov"><i>F</i></span>（注意保持原运算优先级）。</li>
-                <li><b>对偶规则</b>：同反演规则，但<b>不改变原变量与反变量</b>，得到对偶式 <i>F</i>*。</li>
+                <li><b>代入规则</b>：任一变量用任意逻辑函数代入，等式仍成立。</li>
+                <li><b>反演规则</b>：求反函数 <span class="ov"><i>F</i></span> 时，<code>·</code> 与 <code>+</code> 互换、<code>0</code> 与 <code>1</code> 互换、<b>原变量与反变量互换</b>，并保持原运算优先级（由狄摩根定理导出）。</li>
+                <li><b>对偶规则</b>：<code>·</code> 与 <code>+</code> 互换、<code>0</code> 与 <code>1</code> 互换、<b>变量不变</b>，得对偶式 <i>F</i>*。</li>
               </ul>`
           },
           {
             title: '1.4.3 用布尔代数简化逻辑函数',
             html: `
-              <p>化简目标：使表达式的<b>乘积项最少</b>，且每个乘积项中的<b>变量最少</b>（最简与或式）。</p>
-              <details class="fold"><summary>例题：化简 <i>Y = AB + A<span class="ov">B</span> + <span class="ov">A</span>B</i></summary><div class="fold-body">
+              <p>常用化简方法：</p>
+              <ul>
+                <li><b>并项法</b>：<i>AB</i> + <i>A</i><span class="ov"><i>B</i></span> = <i>A</i>（提取公因子消去变量）</li>
+                <li><b>吸收法</b>：<i>A</i> + <i>AB</i> = <i>A</i></li>
+                <li><b>消去法</b>：<i>AB</i> + <span class="ov"><i>A</i></span><i>C</i> + <i>BC</i> = <i>AB</i> + <span class="ov"><i>A</i></span><i>C</i>（消去冗余项 <i>BC</i>）</li>
+                <li><b>配项法</b>：<i>A</i> = <i>A</i>(<i>B</i> + <span class="ov"><i>B</i></span>)，再与其他项合并</li>
+              </ul>
+              <details class="fold"><summary>例题：用消去法化简 <i>F</i> = <i>AB</i> + <span class="ov"><i>A</i></span><i>C</i> + <i>BC</i></summary><div class="fold-body">
                 <ol class="steps">
-                  <li>前两项合并：<i>AB + A<span class="ov">B</span> = A(B + <span class="ov">B</span>) = A</i></li>
-                  <li>代入吸收律：<i>Y = A + <span class="ov">A</span>B = A + B</i> ✅</li>
+                  <li>配项：<i>BC</i> = <i>BC</i>(<i>A</i> + <span class="ov"><i>A</i></span>) = <i>ABC</i> + <span class="ov"><i>A</i></span><i>BC</i></li>
+                  <li>代入原式：<i>F</i> = <i>AB</i>(1 + <i>C</i>) + <span class="ov"><i>A</i></span><i>C</i>(1 + <i>B</i>)</li>
+                  <li>化简得：<i>F</i> = <i>AB</i> + <span class="ov"><i>A</i></span><i>C</i>（冗余项 <i>BC</i> 被消去）✅</li>
                 </ol>
               </div></details>`
           }
@@ -853,7 +900,11 @@ const CHAPTERS = [
           {
             title: '1.5.1 卡诺图的结构与特点',
             html: `
-              <p><span class="term" data-tip="按格雷码顺序排列最小项的二维方格图">卡诺图</span>中，几何上<b>相邻（含上下、左右边缘循环相邻）的方格</b>在逻辑上也只差一个变量，合并后即可消去该变量。</p>
+              <ul>
+                <li>卡诺图是逻辑函数的方格图表示，<i>n</i> 变量有 <b>2<sup><i>n</i></sup></b> 个小格，每个小格对应一个<b>最小项</b>。</li>
+                <li>行列按循环码（格雷码）排列：<code>00, 01, 11, 10</code>。</li>
+                <li><b>相邻性</b>：上下左右相邻；且最左列与最右列相邻、最上行与最下行相邻（卷绕/对称相邻）；<b>四个角也相邻</b>。</li>
+              </ul>
               <div class="widget" id="kmap-demo">
                 <b>🧩 交互式 4 变量卡诺图（点击方格切换 0 / 1 / ×）</b>
                 <div id="kmap-grid" style="margin-top:8px"></div>
@@ -863,11 +914,21 @@ const CHAPTERS = [
           {
             title: '1.5.2 用卡诺图简化逻辑函数',
             html: `
-              <div class="callout key"><b>卡诺图化简三步法</b>
-                ① 填入真值表（1 填最小项，任意项填 ×）；<br>
-                ② 按 2<sup><i>k</i></sup> 个相邻 1 格画圈（圈越大越好、圈数越少越好、每个圈至少含 1 个未被覆盖的新 1 格）；<br>
-                ③ 保留圈内取值不变的变量，写出最简与或式。
-              </div>`
+              <div class="callout key"><b>简化规则</b>
+                (1) 所选组合必须使每个 1 方格至少被包含一次；<br>
+                (2) 应当使各个组合包含尽可能多的方格；<br>
+                (3) 所有的方格包含在尽可能少的不同组合中。
+              </div>
+              <p><b>简化步骤（点击逐步查看）</b>：</p>
+              <ol class="steps">
+                <li>将逻辑函数表示在卡诺图上。</li>
+                <li>识别圈围 8 方格的组合，如果不能则进行下一步。</li>
+                <li>识别圈围 4 方格的组合，如果不能则进行下一步。</li>
+                <li>识别圈围 2 方格的组合。</li>
+                <li>将不能与任何其他方格组合的一个方格单独圈围。</li>
+                <li>将各圈围组成的与项进行相加。</li>
+              </ol>
+              <p><b>无关项（任意项）</b>：该组输入不可能出现，或输出任意；化简时可当 <code>1</code> 也可当 <code>0</code>，用于使函数尽量得到简化。</p>`
           }
         ]
       },
@@ -878,44 +939,57 @@ const CHAPTERS = [
             title: '1.6.1 集成电路的制造技术类型',
             html: `
               <ul>
-                <li><b>TTL（双极型）</b>：速度较快、驱动能力强，但功耗较大（典型如 74LS 系列）。</li>
-                <li><b>CMOS（单极型）</b>：静态功耗极低、电源电压范围宽、抗干扰强（典型如 74HC、4000 系列），是当前主流。</li>
+                <li><b>CMOS 系列</b>：金属氧化物半导体晶体管作为开关元件的门电路。</li>
+                <li><b>TTL 系列</b>：对静电放电不敏感，实验室和数字系统应用多。</li>
               </ul>`
           },
           {
             title: '1.6.2 集成电路的封装类型',
-            html: `<p>常见封装：<b>DIP</b>（双列直插式，方便实验插面包板）、<b>SOP / SOIC</b>（小外形贴片）、<b>QFP</b>（四方扁平封装）、<b>BGA</b>（球栅阵列，适合高引脚数芯片）。</p>`
+            html: `
+              <ul>
+                <li><b>DIP</b>：早期常用，便于插拔。</li>
+                <li><b>SOIC</b>：表面贴装。</li>
+                <li><b>引脚编号</b>：从缺口/标记处起，<b>逆时针</b>编号。</li>
+              </ul>`
           },
           {
             title: '1.6.3 集成电路的规模类型',
-            html: `<p>按集成门数分为：<b>SSI</b>（小规模，&lt;10 门）、<b>MSI</b>（中规模，10~99 门，如译码器/计数器）、<b>LSI</b>（大规模，100~9999 门）、<b>VLSI / ULSI</b>（超大规模，≥10⁴ 门，如 CPU）。</p>`
+            html: `
+              <table>
+                <thead><tr><th>缩写</th><th>名称</th><th>等效门规模</th></tr></thead>
+                <tbody>
+                  <tr><td>SSI</td><td>小规模集成电路</td><td>1 ~ 11 个等效门</td></tr>
+                  <tr><td>MSI</td><td>中规模集成电路</td><td>12 ~ 99 个等效门（如译码器、计数器）</td></tr>
+                  <tr><td>LSI</td><td>大规模集成电路</td><td>100 ~ 9999 个等效门</td></tr>
+                  <tr><td>VLSI</td><td>超大规模集成电路</td><td>10000 ~ 99999 个门</td></tr>
+                  <tr><td>ULSI</td><td>巨大规模集成电路</td><td>10 万门以上</td></tr>
+                </tbody>
+              </table>`
           },
           {
             title: '1.6.4 集成电路的使用特性',
-            html: `<p>重点关注：<b>扇出系数 <i>N<sub>O</sub></i></b>（一个门最多可带动的同类门负载数）、<b>传输延迟时间 <i>t<sub>pd</sub></i></b>、<b>噪声容限</b>（抗干扰能力）以及 <b>多余输入端的处理</b>（TTL 悬空相当于高电平；CMOS 严禁悬空，与门接 <i>V<sub>DD</sub></i>、或门接地）。</p>`
+            html: `
+              <ul>
+                <li><b>扇出系数（负载能力）</b>：一个输出能驱动的同类输入端个数。</li>
+                <li><b>延迟特性</b>：输入变化到输出响应的平均延迟，越小越快。</li>
+                <li><b>功耗</b>：静态功耗 + 动态功耗（随频率升高而增大）。</li>
+                <li><b>空脚处理</b>：与门和非门空脚接 <code>+Vcc</code>；或门和或非门接地。</li>
+              </ul>`
           }
         ]
       }
     ],
     quiz: [
-      { type: 'choice', q: '下列编码中，任意两个相邻代码之间只有一位不同的是：', options: ['8421 BCD 码', '格雷码', 'ASCII 码', '余 3 码'], answer: 1, explain: '格雷码（循环码）任意相邻两组代码之间只有 1 位发生变化。' },
-      { type: 'fill', q: '十进制数 25 对应的二进制数是 ______。', answer: ['11001'], explain: '25 = 16 + 8 + 1 = (11001)₂。' },
-      { type: 'choice', q: '根据吸收律，逻辑式 A + A\'B 化简的结果是：', options: ['A', 'B', 'A + B', 'AB'], answer: 2, explain: 'A + A\'B = (A + A\')(A + B) = A + B。' },
-      { type: 'choice', q: '卡诺图化简时，画圈所包含的相邻最小项个数必须是：', options: ['任意正整数', '偶数', '2 的幂次（1, 2, 4, 8…）', '质数'], answer: 2, explain: '只有包含 2^k 个逻辑相邻方格的矩形圈，才能消去 k 个变量。' },
-      { type: 'fill', q: '三态门除了高电平和低电平外，第三种输出状态称为 ______。', answer: ['高阻态', '高阻', 'Z'], explain: '三态门的三种状态为：0（低电平）、1（高电平）和高阻态（Z）。' },
-      { type: 'choice', q: '关于 CMOS 集成电路的多余输入端，正确的处理方式是：', options: ['可以悬空', '严禁悬空，应根据逻辑功能接高或低电平', '一律接地', '一律接电源'], answer: 1, explain: 'CMOS 输入阻抗极高，悬空易受静电干扰损坏或产生误动作，必须按逻辑要求接确定电平。' },
-      { type: 'fill', q: '十六进制数 (3A.8)₁₆ 转换为十进制数是 ______。', answer: ['58.5'], explain: '(3A.8)₁₆ = 3×16 + 10×1 + 8×16⁻¹ = 48 + 10 + 0.5 = 58.5。' },
-      { type: 'fill', q: '十进制小数 0.6875 转换为二进制小数是 ______。', answer: ['0.1011', '.1011'], explain: '0.6875 = 0.5 + 0.125 + 0.0625 = 0.1011₂。' },
-      { type: 'fill', q: '十进制数 66 转换为八进制数是 ______。', answer: ['102'], explain: '66 = 64 + 2 = (102)₈。' },
-      { type: 'fill', q: '十进制数 66 转换为十六进制数是 ______。', answer: ['42'], explain: '66 = 4×16 + 2 = (42)₁₆。' },
-      { type: 'choice', q: '十进制数 11.25 对应的 8421BCD 码是：', options: ['00010001.00100101', '00010001.00100100', '1011.01', '00010001.0101'], answer: 0, explain: '11 → 0001 0001，0.25 → 0010 0101，故为 0001 0001 . 0010 0101。' },
-      { type: 'choice', q: '下列编码中，属于无权码的是：', options: ['8421 码', '2421 码', '余 3 码', '5421 码'], answer: 2, explain: '8421、2421、5421 码各位都有固定权值，是有权码；余 3 码与格雷码是无权码。' },
-      { type: 'choice', q: '用 8421BCD 码计算 5 + 7，因 0101 + 0111 = 1100 已超出 1001（伪码），需加多少进行修正？', options: ['0110（即 6）', '0010（即 2）', '0100（即 4）', '0001（即 1）'], answer: 0, explain: 'BCD 加法结果超出 1001 时需加 6（0110）修正：1100 + 0110 = 1 0010，即十进制的 12。' },
-      { type: 'choice', q: '用布尔代数化简 F = AB + AD + BD + ACD 的最简与或式为：', options: ['AB + AD + BD', 'AB + AD', 'AD + BD', 'A(B + D)'], answer: 0, explain: 'ACD 被 AD 覆盖（A=1、D=1 时成立）可消去，得 F = AB + AD + BD，三者两两不可再合并。' },
-      { type: 'choice', q: '卡诺图化简 F(A,B,C,D) = Σm(0,2,7,13,15) + Σd(1,3,4,5,6,8,10) 的结果为：', options: ['A′ + ABD', 'A′B′ + ABD', 'A′ + A′BD', 'B′D′ + BCD'], answer: 0, explain: 'A=0 区域（m0~m7 含全部无关项）可整体圈出得 A′；m13、m15 圈出得 ABD。故 F = A′ + ABD。' }
+      { type: 'fill', q: '二进制数 1011.01B 转换为十进制数是 ______。', answer: ['11.25', '11.25D'], explain: '1011.01B = 8 + 0 + 2 + 1 + 0 + 0.25 = 11.25D。' },
+      { type: 'choice', q: '以下编码中，属于「无权码」且是「自补码」（对 9 的补等于逐位取反）的是：', options: ['8421 BCD 码', '余 3 码', '格雷码', '二进制原码'], answer: 1, explain: '余 3 码 = 8421 码 + 0011，它是无权码且具有自补性。' },
+      { type: 'choice', q: '同一物理电路，正逻辑下的「与非门」在负逻辑下等价于：', options: ['与门', '或门', '或非门', '同或门'], answer: 2, explain: '正逻辑的「与非」= 负逻辑的「或非」，正逻辑的「与」= 负逻辑的「或」。' },
+      { type: 'choice', q: '逻辑运算 <i>A</i> ⊕ <i>B</i>（异或）等价于：', options: ['<i>AB</i> + <span class="ov"><i>A</i></span><span class="ov"><i>B</i></span>', '<span class="ov"><i>A</i></span><i>B</i> + <i>A</i><span class="ov"><i>B</i></span>', '<span class="ov"><i>A · B</i></span>', '<span class="ov"><i>A + B</i></span>'], answer: 1, explain: '异或：<i>A</i> ⊕ <i>B</i> = <span class="ov"><i>A</i></span><i>B</i> + <i>A</i><span class="ov"><i>B</i></span>；同或：<i>A</i> ⊙ <i>B</i> = <i>AB</i> + <span class="ov"><i>A</i></span><span class="ov"><i>B</i></span>。' },
+      { type: 'choice', q: '根据布尔代数消去法，<i>AB</i> + <span class="ov"><i>A</i></span><i>C</i> + <i>BC</i> 化简后的结果是：', options: ['<i>AB</i> + <i>BC</i>', '<i>AB</i> + <span class="ov"><i>A</i></span><i>C</i>', '<span class="ov"><i>A</i></span><i>C</i> + <i>BC</i>', '<i>A</i> + <i>B</i> + <i>C</i>'], answer: 1, explain: '由消去法公式，<i>BC</i> 是冗余项可直接消去，得 <i>AB</i> + <span class="ov"><i>A</i></span><i>C</i>。' },
+      { type: 'choice', q: '根据狄摩根定理，<span class="ov"><i>A + B</i></span> 等于：', options: ['<span class="ov"><i>A</i></span> + <span class="ov"><i>B</i></span>', '<span class="ov"><i>A</i></span> · <span class="ov"><i>B</i></span>', '<i>A</i> · <i>B</i>', '<span class="ov"><i>AB</i></span>'], answer: 1, explain: '狄摩根定理：<span class="ov"><i>A + B</i></span> = <span class="ov"><i>A</i></span> · <span class="ov"><i>B</i></span>，<span class="ov"><i>AB</i></span> = <span class="ov"><i>A</i></span> + <span class="ov"><i>B</i></span>。' },
+      { type: 'fill', q: '数字集成电路芯片 DIP 封装的引脚编号，是从缺口/标记处起按 ______ 方向编号。', answer: ['逆时针'], explain: '引脚编号规则：从缺口/标记处起，逆时针方向依次编号。' },
+      { type: 'choice', q: '数字集成电路中，对多余空脚的处理方式，正确的是：', options: ['与门空脚接地，或门空脚接 +Vcc', '与门空脚接 +Vcc，或门和或非门空脚接地', '所有门电路空脚一律接地', '所有门电路空脚一律接 +Vcc'], answer: 1, explain: '与门和非门空脚接 +Vcc；或门和或非门空脚接地。' }
     ],
     mount(root) {
-      // 1. 进制转换器
       const conv = root.querySelector('#base-converter');
       if (conv) {
         const inp = conv.querySelector('input'), sel = conv.querySelector('select'), out = conv.querySelector('.conv-out');
@@ -923,17 +997,16 @@ const CHAPTERS = [
         const run = () => {
           const b = +sel.value, raw = inp.value.trim().toUpperCase();
           if (!raw) { out.innerHTML = '<span class="muted">请输入非负整数</span>'; return; }
-          if (!rules[b].test(raw)) { out.innerHTML = `<span style="color:var(--danger)">输入不合法</span>`; return; }
+          if (!rules[b].test(raw)) { out.innerHTML = '<span style="color:var(--danger)">输入不合法</span>'; return; }
           const n = parseInt(raw, b);
           if (!Number.isSafeInteger(n)) { out.innerHTML = '<span style="color:var(--danger)">数值过大</span>'; return; }
           out.innerHTML = `<table><tbody>
-            <tr><th>二进制</th><td><code>${n.toString(2)}</code></td><th>八进制</th><td><code>${n.toString(8)}</code></td></tr>
-            <tr><th>十进制</th><td><code>${n}</code></td><th>十六进制</th><td><code>${n.toString(16).toUpperCase()}</code></td></tr>
+            <tr><th>二进制 (B)</th><td><code>${n.toString(2)}</code></td><th>八进制 (O)</th><td><code>${n.toString(8)}</code></td></tr>
+            <tr><th>十进制 (D)</th><td><code>${n}</code></td><th>十六进制 (H)</th><td><code>${n.toString(16).toUpperCase()}</code></td></tr>
           </tbody></table>`;
         };
         inp.addEventListener('input', run); sel.addEventListener('change', run); run();
       }
-      // 2. 逻辑门模拟器
       const sim = root.querySelector('#gate-sim');
       if (sim) {
         let A = 0, B = 0;
@@ -943,14 +1016,13 @@ const CHAPTERS = [
           sim.querySelector('[data-bit="A"]').classList.toggle('hi', A === 1);
           sim.querySelector('[data-bit="B"]').textContent = 'B = ' + B;
           sim.querySelector('[data-bit="B"]').classList.toggle('hi', B === 1);
-          out.innerHTML = `<table><thead><tr><th>与 (A·B)</th><th>或 (A+B)</th><th>非 (Ā)</th><th>与非</th><th>或非</th><th>异或 (A⊕B)</th><th>同或 (A⊙B)</th></tr></thead>
+          out.innerHTML = `<table><thead><tr><th>与 (AB)</th><th>或 (A+B)</th><th>非 (<span class="ov">A</span>)</th><th>与非 (<span class="ov">AB</span>)</th><th>或非 (<span class="ov">A+B</span>)</th><th>异或 (A⊕B)</th><th>同或 (A⊙B)</th></tr></thead>
             <tbody><tr><td><b>${A & B}</b></td><td><b>${A | B}</b></td><td><b>${1 - A}</b></td><td><b>${1 - (A & B)}</b></td><td><b>${1 - (A | B)}</b></td><td><b>${A ^ B}</b></td><td><b>${1 - (A ^ B)}</b></td></tr></tbody></table>`;
         };
         sim.querySelector('[data-bit="A"]').onclick = () => { A ^= 1; draw(); };
         sim.querySelector('[data-bit="B"]').onclick = () => { B ^= 1; draw(); };
         draw();
       }
-      // 3. 卡诺图交互
       const km = root.querySelector('#kmap-grid');
       if (km) {
         const grays = ['00', '01', '11', '10'];
@@ -959,17 +1031,17 @@ const CHAPTERS = [
         const info = root.querySelector('#kmap-info');
         const renderK = () => {
           let h = '<div class="kmap"><div class="kh">AB\\CD</div>' + grays.map(g => `<div class="kh">${g}</div>`).join('');
-          grays.forEach((ra, r) => {
+          grays.forEach((ra) => {
             h += `<div class="kh">${ra}</div>`;
-            grays.forEach((ca, c) => {
+            grays.forEach((ca) => {
               const idx = parseInt(ra + ca, 2);
               const v = vals[idx];
               h += `<button type="button" class="kc ${v === 1 ? 'v1' : v === '×' ? 'vx' : ''}" data-i="${idx}">${v}</button>`;
             });
           });
           km.innerHTML = h + '</div>';
-          const mins = vals.map((v, i) => v === 1 ? 'm' + i : '').filter(Boolean);
-          info.innerHTML = `当前最小项：<code>Σm(${mins.map(x => x.slice(1)).join(', ') || '∅'})</code>（点击方格可在 0 / 1 / × 之间切换）`;
+          const mins = vals.map((v, i) => v === 1 ? i : -1).filter(i => i >= 0);
+          info.innerHTML = `当前最小项：<code>∑m(${mins.join(', ') || '∅'})</code>（点击方格可在 0 / 1 / × 之间切换）`;
           km.querySelectorAll('.kc').forEach(b => b.onclick = () => {
             const i = +b.dataset.i;
             vals[i] = vals[i] === 0 ? 1 : vals[i] === 1 ? '×' : 0;
@@ -986,25 +1058,29 @@ const CHAPTERS = [
     id: 2,
     title: '组合逻辑',
     author: 'NiLuo',
-    updated: '2026-11-18',
-    summary: '组合逻辑分析与设计、等价变换、选择器/分配器、译码器/编码器、比较器/加法器与奇偶校验',
-    intro: '组合逻辑电路任意时刻的输出仅取决于该时刻的输入，不含记忆元件。本章系统学习组合逻辑的分析、设计、等价变换以及常用中规模组合逻辑部件。',
+    updated: '2026-11-21',
+    summary: '组合逻辑分析与设计、等价变换、数据选择器/分配器、译码器/编码器、比较器/加法器与奇偶校验器',
+    intro: '本章学习组合逻辑电路的分析方法（含竞争冒险）、组合逻辑设计步骤、基于狄摩根定理的等价变换，以及常见中规模组合逻辑部件。',
     sections: [
       {
         title: '2.1 组合逻辑分析',
         subs: [
-          { title: '2.1.1 逐级电平推导法', html: '<p>从输入端开始，按信号流向逐级推导出各中间节点及输出端的电平关系，直观但仅适合简单电路。</p>' },
-          { title: '2.1.2 列写布尔表达式法', html: '<p>从输入到输出逐级写出各逻辑门的输出表达式，经布尔代数或卡诺图化简后，再由最简表达式概括电路逻辑功能。</p>' },
-          { title: '2.1.3 数字波形图分析法', html: '<p>给定各输入信号的时序波形，逐时段求得输出电平并画出输出波形图，常用于验证功能与观察瞬态毛刺。</p>' },
-          { title: '2.1.4 列写逻辑电路真值表法', html: '<p>列出所有 2<sup><i>n</i></sup> 种输入组合对应的输出值。真值表唯一确定电路的逻辑功能。</p>' },
+          { title: '2.1.1 逐级电平推导法', html: '<p>给定一组输入电平，沿信号路径从输入级开始，逐级算各门输出电平，直至得到最终输出。适合给定输入组合、求输出的快速判断。</p>' },
+          { title: '2.1.2 列写布尔表达式法', html: '<p>从输入到输出逐级写出各点表达式，最后得到输出表达式，再化简分析功能。</p>' },
+          { title: '2.1.3 数字波形图分析法', html: '<p>给定输入波形，根据各门的功能逐段时间区间推导输出波形。</p>' },
+          { title: '2.1.4 列写逻辑电路真值表法', html: '<p>由逻辑图或表达式列出完整真值表，再从真值表归纳逻辑功能。</p>' },
           {
             title: '2.1.5 组合逻辑中的竞争冒险',
             html: `
-              <p>同一信号经不同路径到达某门输入端时，由于门延迟不同产生时间差，称为<span class="term" data-tip="信号到达同一逻辑门的时间先后不一，可能导致瞬时错误脉冲">竞争</span>；由此使输出产生不应有的尖峰脉冲，称为<b>冒险（毛刺）</b>。</p>
-              <div class="callout warn"><b>消除冒险的常用方法</b>
-                ① 增加冗余乘积项（如 <i>Y = AB + <span class="ov">A</span>C</i> 补充冗余项 + <i>BC</i>）；<br>
-                ② 输出端并联小电容滤波；<br>
-                ③ 引入选通脉冲（只在稳定后采样）。
+              <ul>
+                <li><b>竞争</b>：同一信号经不同路径到达某点的时间不同。</li>
+                <li><b>冒险</b>：竞争导致输出出现错误的尖峰脉冲。</li>
+              </ul>
+              <div class="callout warn"><b>消除方法</b>
+                1) 增加冗余项（在相切处补一个圈，即加一致项）；<br>
+                2) 输出端并联滤波电容；<br>
+                3) 加选通脉冲，避开毛刺时刻；<br>
+                4) 采用同步设计。
               </div>`
           }
         ]
@@ -1016,67 +1092,93 @@ const CHAPTERS = [
             title: '2.2.1 组合逻辑设计步骤',
             html: `
               <ol class="steps">
-                <li><b>逻辑抽象</b>：确定输入变量和输出变量，并对状态进行 0/1 编码。</li>
-                <li><b>列真值表</b>：根据题意列出输入与输出的对应关系。</li>
-                <li><b>化简表达式</b>：用卡诺图或布尔代数求最简表达式。</li>
-                <li><b>画逻辑图</b>：根据所选门电路类型（如与非门）画出电路图。</li>
+                <li><b>逻辑描述</b>：分析需求，确定输入、输出变量及其含义。</li>
+                <li><b>逻辑函数的简化</b>：让函数变成最简。</li>
+                <li><b>逻辑函数的变换</b>：将第二步的最简表达式变换成器件所需的形式。</li>
+                <li><b>画逻辑图</b>：根据第三步变换后的表达式画出逻辑图。</li>
               </ol>`
           },
-          { title: '2.2.2 逻辑问题的描述', html: '<p>将文字描述的实际需求转化为严谨的真值表或卡诺图，重点要分清正逻辑条件与约束条件。</p>' },
-          { title: '2.2.3 利用任意项的逻辑设计', html: '<p>对于实际不会出现的输入组合（如 8421 BCD 码的 <code>1010~1111</code>），其输出记为<b>任意项（× / d）</b>。在卡诺图化简时，把有助于扩大圈的 × 当作 <code>1</code>，其余当作 <code>0</code>，可大幅简化电路。</p>' }
+          { title: '2.2.2 逻辑问题的描述', html: '<p>把文字描述转成真值表：确定输入/输出变量个数；给变量和状态编码；考虑所有可能情况。描述要<b>完整、无歧义、无遗漏</b>。</p>' },
+          { title: '2.2.3 利用任意项的逻辑设计', html: '<p><b>任意项（无关项）</b>：某些输入组合不会出现，或出现时输出可任意，记作 <code>d</code> 或 <code>×</code>。在卡诺图中把任意项当 <code>1</code> 用于扩大圈，可得到更简单的电路。</p>' }
         ]
       },
       {
         title: '2.3 组合逻辑电路的等价变换',
         subs: [
-          { title: '2.3.1 狄摩根定理的应用', html: '<p>利用 <span class="ov"><i>A+B</i></span> = <span class="ov"><i>A</i></span>·<span class="ov"><i>B</i></span> 与 <span class="ov"><i>AB</i></span> = <span class="ov"><i>A</i></span>+<span class="ov"><i>B</i></span>，实现与/或结构与非门结构之间的互换。</p>' },
-          { title: '2.3.2 与非门、或非门作为通用元件', html: '<p>仅用<b>与非门</b>（或仅用<b>或非门</b>）即可实现与、或、非三种基本运算，从而实现任意组合逻辑函数，因此二者被称为<b>通用逻辑元件</b>。</p>' },
-          { title: '2.3.3 利用与非门/或非门进行等价变换', html: '<p><b>与或式 → 全与非门</b>：对最简与或式两次求反，<i>Y = AB + CD</i> = <span class="ov"><span class="ov"><i>AB</i></span> · <span class="ov"><i>CD</i></span></span>，即「与-与」结构直接变为「与非-与非」。<b>或与式 → 全或非门</b>：同样两次求反，变为「或非-或非」。</p>' },
-          { title: '2.3.4 逻辑函数的“与或非”门实现', html: '<p>求原函数的反函数 <span class="ov"><i>Y</i></span> 的最简与或式，再整体求反 <i>Y</i> = <span class="ov"><span class="ov"><i>Y</i></span></span>，即可直接用单片「与或非」门实现。</p>' }
+          { title: '2.3.1 狄摩根定理的应用', html: '<p>是实现「用一种门实现任意逻辑」的理论基础。用狄摩根定理把表达式在「与或」与「或与」之间变换，也可把整体取反拆开。</p>' },
+          {
+            title: '2.3.2 与非门、或非门作为通用元件',
+            html: `
+              <p><b>与非门是通用门</b>：与、或、非都可用与非门实现：</p>
+              <ul>
+                <li><b>非</b>：<span class="ov"><i>A</i></span> = <span class="ov"><i>A · A</i></span></li>
+                <li><b>与</b>：<i>AB</i> = <span class="ov"><span class="ov"><i>AB</i></span></span></li>
+                <li><b>或</b>：<i>A</i> + <i>B</i> = <span class="ov"><span class="ov"><i>A</i></span> · <span class="ov"><i>B</i></span></span></li>
+              </ul>`
+          },
+          {
+            title: '2.3.3 利用与非门/或非门进行等价变换',
+            html: `
+              <ul>
+                <li><b>与或式 → 与非-与非式</b>：对最简与或式「两次取反」，再用狄摩根定理把中间层变与非。</li>
+                <li><b>或与式 → 或非-或非式</b>：同理两次取反。</li>
+              </ul>`
+          },
+          {
+            title: '2.3.4 逻辑函数的“与或非”门实现',
+            html: `
+              <ul>
+                <li>方法一：对 <i>F</i> 两次求反（<span class="ov"><span class="ov"><i>F</i></span></span>）；</li>
+                <li>方法二：先求 <span class="ov"><i>F</i></span> 的最简与或式，再对 <span class="ov"><i>F</i></span> 一次求反。</li>
+              </ul>`
+          }
         ]
       },
       {
         title: '2.4 数据选择器与分配器',
         subs: [
           {
-            title: '2.4.1 数据选择器（MUX）',
+            title: '2.4.1 数据选择器（多路转换器 / 多路开关）',
             html: `
-              <p>从 2<sup><i>n</i></sup> 路输入数据中，根据 <i>n</i> 位地址选择信号 <i>S</i> 选出 1 路送到输出端（多选一）。常见芯片：<b>74LS151</b>（8 选 1）、<b>74LS153</b>（双 4 选 1）。</p>
-              <div class="callout tip"><b>重要应用：用 MUX 实现任意逻辑函数</b>将部分输入变量接地址端，其余变量或 0/1 接数据输入端即可无需门电路直接实现函数。</div>`
+              <ul>
+                <li><b>功能</b>：从 2<sup><i>n</i></sup> 路数据输入中，按 <i>n</i> 位地址选择 1 路送到输出。</li>
+                <li><b>4 选 1 输出表达式</b>：<i>F</i> = <span class="ov"><i>S</i><sub>1</sub></span><span class="ov"><i>S</i><sub>0</sub></span><i>D</i><sub>0</sub> + <span class="ov"><i>S</i><sub>1</sub></span><i>S</i><sub>0</sub><i>D</i><sub>1</sub> + <i>S</i><sub>1</sub><span class="ov"><i>S</i><sub>0</sub></span><i>D</i><sub>2</sub> + <i>S</i><sub>1</sub><i>S</i><sub>0</sub><i>D</i><sub>3</sub> = ∑ <i>m<sub>i</sub> · D<sub>i</sub></i></li>
+              </ul>`
           },
-          { title: '2.4.2 数据分配器（DEMUX）', html: '<p>与选择器相反，将 1 路输入数据根据地址选择信号分配到 2<sup><i>n</i></sup> 路输出中的某一路（一分多），可用带使能端的译码器实现。</p>' }
+          { title: '2.4.2 数据分配器（DEMUX）', html: '<p><b>功能</b>：把 1 路输入数据，按 <i>n</i> 位地址分配到 2<sup><i>n</i></sup> 路输出中的一路（相当于一个输入换多个输出）。</p>' }
         ]
       },
       {
         title: '2.5 译码器和编码器',
         subs: [
           {
-            title: '2.5.1 译码器（Decoder）',
+            title: '2.5.1 译码器',
             html: `
-              <p>将二进制代码还原为对应输出信号（如 3-8 线译码器 <b>74LS138</b>：3 位输入对应 8 个低电平有效输出 <span class="ov"><i>Y</i><sub>0</sub></span> ~ <span class="ov"><i>Y</i><sub>7</sub></span>）。配合与非门可实现任意组合逻辑函数；<b>74LS48</b> 为七段数码管显示译码器。</p>`
-          },
-          {
-            title: '2.5.2 编码器（Encoder）',
-            html: `
-              <p>将多个有效信号编成二进制代码：</p>
               <ul>
-                <li><b>普通编码器</b>：每次只允许一个输入有效。</li>
-                <li><b>优先编码器（如 74LS148，8-3 线）</b>：允许多个输入同时有效，只对<b>优先级最高</b>的输入进行编码。</li>
+                <li><b>功能</b>：<i>n</i> 位输入 → 2<sup><i>n</i></sup> 个输出，每个输出对应一个输入编码。</li>
+                <li><b>常见的译码器集成组件</b>：双 2 线-4 线译码器；3 线-8 线译码器；4 线-16 线译码器和 4 线-10 线译码器（用于 BCD 码译码）。</li>
               </ul>`
-          }
+          },
+          { title: '2.5.2 编码器', html: '<p><b>优先编码器</b>：允许多个输入同时有效，只对<b>优先级最高</b>的输入进行编码。</p>' }
         ]
       },
       {
         title: '2.6 数据比较器和加法器',
         subs: [
-          { title: '2.6.1 数据比较器', html: '<p>比较两个二进制数 <i>A</i> 与 <i>B</i> 的大小，输出 <i>A &gt; B</i>、<i>A = B</i>、<i>A &lt; B</i> 三种结果（典型 4 位级联芯片：<b>74LS85</b>）。</p>' },
+          {
+            title: '2.6.1 数据比较器',
+            html: `
+              <ul>
+                <li><b>功能</b>：比较两个二进制数的大小，输出 <i>A</i> &gt; <i>B</i>、<i>A</i> = <i>B</i>、<i>A</i> &lt; <i>B</i>。</li>
+                <li><b>比较方式</b>：从高位到低位逐位进行，高位不等即定结果。</li>
+              </ul>`
+          },
           {
             title: '2.6.2 加法器',
             html: `
               <ul>
-                <li><b>半加器</b>：只相加本位 <i>A、B</i>，不考虑低位进位：<i>S = A ⊕ B</i>，<i>C = AB</i>。</li>
-                <li><b>全加器（FA）</b>：考虑低位进位 <i>C<sub>in</sub></i>：<i>S = A ⊕ B ⊕ C<sub>in</sub></i>，<i>C<sub>out</sub> = AB + (A ⊕ B)C<sub>in</sub></i>。</li>
-                <li><b>多位加法器</b>：行波进位加法器（简单但有进位延迟）与 <b>超前进位加法器</b>（并行计算各位进位，速度快，如 74LS283）。</li>
+                <li><b>串行加法器</b>：多个全加器串行连接。</li>
+                <li><b>并行加法器</b>：速度相比于串行加法器快。</li>
               </ul>`
           }
         ]
@@ -1084,21 +1186,34 @@ const CHAPTERS = [
       {
         title: '2.7 奇偶校验器',
         subs: [
-          { title: '2.7.1 奇偶校验的基本原理', html: '<p>通过附加 1 位校验位，使整个代码（数据位 + 校验位）中 <code>1</code> 的总个数为奇数（<b>奇校验</b>）或偶数（<b>偶校验</b>），核心部件是<b>异或门</b>树。</p>' },
-          { title: '2.7.2 具有奇偶校验的数据传输', html: '<p>发送端产生校验位随数据发出，接收端重新计算校验位：若发现奇偶性不符则说明传输中发生了<b>奇数位错误</b>（注意：偶数位同时出错无法检出，且不能自动纠错）。</p>' }
+          {
+            title: '2.7.1 奇偶校验的基本原理',
+            html: `
+              <ul>
+                <li>偶数个 1，它的和（异或）总是 <code>0</code>；奇数个 1，它的和总是 <code>1</code>。</li>
+                <li>简单奇偶校验<b>只能发现奇数个位错</b>，不能发现偶数个位错，也不能定位/纠正错误。</li>
+              </ul>`
+          },
+          {
+            title: '2.7.2 具有奇偶校验的数据传输',
+            html: `
+              <ul>
+                <li><b>发送端</b>：信息位 + 校验位 → 传输。</li>
+                <li><b>接收端</b>：对收到的信息位重算校验位，与收到校验位比较：一致 → 认为无误；不一致 → 检出错误。</li>
+              </ul>`
+          }
         ]
       }
     ],
     quiz: [
-      { type: 'choice', q: '组合逻辑电路的输出信号取决于：', options: ['仅当前输入', '当前输入与原来状态', '时钟脉冲边沿', '仅原来状态'], answer: 0, explain: '组合逻辑无记忆元件，任意时刻输出仅由该时刻输入决定。' },
-      { type: 'choice', q: '下列芯片中，属于 3 线-8 线译码器的是：', options: ['74LS151', '74LS138', '74LS148', '74LS85'], answer: 1, explain: '74LS138 是 3-8 译码器；151 是 8 选 1 MUX；148 是 8-3 优先编码器；85 是 4 位比较器。' },
-      { type: 'fill', q: '半加器本位和 S 的逻辑表达式为 S = ______（用 A、B 和 ⊕ 表示）。', answer: ['A⊕B', 'A^B'], explain: '半加器不考虑低位进位，本位和 S = A ⊕ B，进位 C = AB。' },
-      { type: 'choice', q: '用 8 选 1 数据选择器最多可以直接实现几个变量的任意逻辑函数？', options: ['3 个', '4 个', '8 个', '2 个'], answer: 1, explain: '3 个地址端接 3 个变量，第 4 个变量及其反变量或 0/1 接数据端，共可实现 4 变量函数。' },
-      { type: 'choice', q: '奇偶校验码在数据传输中能够检测出：', options: ['任意多位错误', '奇数个位错误', '偶数个位错误', '并能自动纠正 1 位错'], answer: 1, explain: '奇偶校验只能发现奇数个位发生翻转的错误，不能检出偶数位错误，也不能纠错。' },
-      { type: 'choice', q: '用 3 线-8 线译码器实现“判断输入的三位二进制数是否 ≥ 4”，其输出函数的最简表达式是：', options: ['A₂（最高位）', 'A₁', 'A₀', 'A₂ ⊕ A₁'], answer: 0, explain: '三位二进制数 ≥ 4 即 100~111，恰为最高位 A₂ = 1，故 F = A₂。' },
-      { type: 'choice', q: '保密锁设计：A、B、C 三键，仅当 A 与 B（或 A 与 C）同时按下时开锁 F=1，A 单独按下不报警，其余情况报警 G=1。开锁函数 F 与报警函数 G 分别为：', options: ['F = A(B+C)，G = A′', 'F = ABC，G = A′+B′+C′', 'F = A(B+C)，G = A′B′C′', 'F = AB+AC+BC，G = A′'], answer: 0, explain: '开锁状态为 111、110、101，故 F = AB + AC = A(B+C)；报警状态为 000~011（A=0 时），故 G = A′。' },
-      { type: 'choice', q: '某优先编码器输入优先级从高到低为特快、直快、慢车，当特快与慢车同时请求时，其输出指示：', options: ['特快', '慢车', '直快', '都不指示'], answer: 0, explain: '优先编码器只响应优先级最高的有效输入，故特快优先于慢车。' },
-      { type: 'choice', q: '关于数据选择器（MUX）与数据分配器（DEMUX），下列说法正确的是：', options: ['功能互补：MUX 多路选一，DEMUX 一路分多', '两者功能完全相同', 'DEMUX 是 MUX 的简化', '二者互无关联'], answer: 0, explain: 'MUX 从多路输入中选一路输出；DEMUX 将一路输入分配到多路输出，两者功能互补。' }
+      { type: 'choice', q: '在组合逻辑电路中，同一信号经不同路径到达某点的时间不同称为：', options: ['冒险', '竞争', '同步', '选通'], answer: 1, explain: '竞争是指同一信号经不同路径到达某点的时间不同；由竞争引起的错误尖峰脉冲称为冒险。' },
+      { type: 'choice', q: '下列措施中，不属于消除组合逻辑竞争冒险方法的是：', options: ['增加冗余项（一致项）', '输出端并联滤波电容', '加选通脉冲避开毛刺', '提高时钟脉冲频率'], answer: 3, explain: '消除冒险的四种方法：增加冗余项、输出端并联滤波电容、加选通脉冲、采用同步设计。' },
+      { type: 'choice', q: '用与非门实现「或」运算 <i>A</i> + <i>B</i> 时，等价表达式是：', options: ['<span class="ov"><i>A · B</i></span>', '<span class="ov"><span class="ov"><i>AB</i></span></span>', '<span class="ov"><span class="ov"><i>A</i></span> · <span class="ov"><i>B</i></span></span>', '<span class="ov"><i>A · A</i></span>'], answer: 2, explain: '由狄摩根定理，<i>A</i> + <i>B</i> = <span class="ov"><span class="ov"><i>A + B</i></span></span> = <span class="ov"><span class="ov"><i>A</i></span> · <span class="ov"><i>B</i></span></span>。' },
+      { type: 'choice', q: '4 选 1 数据选择器中，当地址 <i>S</i><sub>1</sub> = 0, <i>S</i><sub>0</sub> = 1 时，输出 <i>F</i> 选通哪一路数据？', options: ['<i>D</i><sub>0</sub>', '<i>D</i><sub>1</sub>', '<i>D</i><sub>2</sub>', '<i>D</i><sub>3</sub>'], answer: 1, explain: '由表达式 <i>F</i> = <span class="ov"><i>S</i><sub>1</sub></span><span class="ov"><i>S</i><sub>0</sub></span><i>D</i><sub>0</sub> + <span class="ov"><i>S</i><sub>1</sub></span><i>S</i><sub>0</sub><i>D</i><sub>1</sub> + <i>S</i><sub>1</sub><span class="ov"><i>S</i><sub>0</sub></span><i>D</i><sub>2</sub> + <i>S</i><sub>1</sub><i>S</i><sub>0</sub><i>D</i><sub>3</sub>，<i>S</i><sub>1</sub><i>S</i><sub>0</sub> = 01 对应 <i>D</i><sub>1</sub>。' },
+      { type: 'fill', q: '用于 BCD 码译码的常见集成译码器是 ______ 线译码器（填如 4线-10线）。', answer: ['4线-10线', '4-10', '4线-10'], explain: '常见译码器有双 2 线-4 线、3 线-8 线、4 线-16 线，以及用于 BCD 码译码的 4 线-10 线译码器。' },
+      { type: 'choice', q: '关于数据比较器的比较过程，下列说法正确的是：', options: ['从低位到高位逐位比较', '从高位到低位逐位进行，高位不等即定结果', '必须把所有位全部比完才能出结果', '只能比较相等，不能比大小'], answer: 1, explain: '数据比较器从高位到低位逐位进行，只要高位不等即可直接确定大小结果。' },
+      { type: 'choice', q: '在奇偶校验中，若数据位中有奇数个 1，则它们的模 2 和（异或结果）总是：', options: ['0', '1', '不确定', '高阻态'], answer: 1, explain: '偶数个 1 的和总是 0；奇数个 1 的和总是 1。' },
+      { type: 'choice', q: '在允许多个输入同时有效的情况下，只对优先级最高的输入进行编码的器件是：', options: ['数据分配器', '优先编码器', '数据比较器', '译码器'], answer: 1, explain: '优先编码器允许多个输入同时有效，且只对优先级最高的输入进行编码。' }
     ]
   },
 
@@ -1106,77 +1221,159 @@ const CHAPTERS = [
   {
     id: 3,
     title: '时序逻辑',
-    author: '成员C',
-    updated: '2026-11-18',
+    author: '慟',
+    updated: '2026-11-21',
     summary: '锁存器、触发器、寄存器、计数器、定时脉冲产生器以及同步时序逻辑分析与设计',
-    intro: '时序逻辑电路由组合逻辑电路和存储（记忆）元件组成，其输出不仅取决于当前输入，还与电路原来的状态有关。',
+    intro: '本章学习具有记忆功能的时序逻辑电路，从基本锁存器与边沿触发器入手，掌握寄存器、计数器、定时脉冲产生器，以及同步时序逻辑的分析与设计方法。',
     sections: [
       {
         title: '3.1 锁存器',
         subs: [
-          { title: '3.1.1 锁存器的基本特性', html: '<p>锁存器是对<b>脉冲电平敏感</b>的双稳态存储单元，在使能信号有效期间输出随输入变化，使能无效时锁存当前状态。</p>' },
-          { title: '3.1.2 基本 SR 锁存器', html: '<p>由两个与非门（或或非门）交叉耦合而成。以或非门 SR 锁存器为例：<code>S=1,R=0</code> 置 1；<code>S=0,R=1</code> 置 0；<code>S=0,R=0</code> 保持；<b><code>S=1,R=1</code> 为禁止/约束状态</b>。</p>' },
-          { title: '3.1.3 门控 SR 锁存器', html: '<p>在基本 SR 锁存器输入端增加控制门和使能端 <i>E</i>：只有当 <i>E</i> = 1 时 <i>S、R</i> 才起作用；<i>E</i> = 0 时保持状态不变。</p>' },
-          { title: '3.1.4 门控 D 锁存器', html: '<p>将 <i>S = D</i>，<i>R</i> = <span class="ov"><i>D</i></span> 相连，彻底消除了 SR 锁存器的约束状态。<i>E</i> = 1 时 <i>Q</i> 跟随 <i>D</i>（透明传输）；<i>E</i> = 0 时锁存数据。</p>' }
+          {
+            title: '3.1.1 锁存器的基本特性',
+            html: `
+              <ul>
+                <li>锁存器有两个稳定物理状态，可长期保持，是能存储 <b>1 位二进制信息</b>的基本单元。</li>
+                <li><b>现态 <i>Q<sup>n</sup></i></b>：输入信号发生之前锁存器的状态。</li>
+                <li><b>次态 <i>Q</i><sup><i>n</i>+1</sup></b>：输入信号发生之后锁存器的状态。</li>
+                <li><b>次态方程（状态方程 / 特征方程）</b>：<i>Q</i><sup><i>n</i>+1</sup> = <i>f</i>(<i>Q<sup>n</sup></i>, <i>X</i>)</li>
+              </ul>`
+          },
+          {
+            title: '3.1.2 基本 SR 锁存器',
+            html: `
+              <ul>
+                <li>由两个与非门（或两个或非门）交叉耦合构成，是各种锁存器/触发器的原型。</li>
+                <li>两个输入端 <b><i>S</i>（置位）</b>、<b><i>R</i>（复位）</b>：<i>S</i> 有效 → <i>Q</i> = 1；<i>R</i> 有效 → <i>Q</i> = 0。</li>
+                <li><b>约束</b>：<i>S</i>、<i>R</i> 不能同时有效（否则状态不确定/禁止）。</li>
+              </ul>`
+          },
+          { title: '3.1.3 门控 SR 锁存器', html: '<p>在基本 SR 锁存器上加一个<b>使能端 <i>EN</i></b>：<i>EN</i> = 1（有效）时，<i>S</i>、<i>R</i> 才起作用；<i>EN</i> = 0 时保持原状态。</p>' },
+          { title: '3.1.4 门控 D 锁存器', html: '<p>用一个 <i>D</i> 输入，经反相后分别接 <i>S</i>、<i>R</i>，从根本上消除「<i>S</i>、<i>R</i> 同时有效」的问题。<br><b>工作</b>：<i>D</i> = 1 且 <i>EN</i> = 1 时锁存器置 “1”；<i>D</i> = 0 且 <i>EN</i> = 1 时锁存器置 “0”。</p>' }
         ]
       },
       {
         title: '3.2 触发器',
         subs: [
-          { title: '3.2.1 SR 触发器', html: '<p>触发器是对<b>时钟脉冲（CLK）边沿敏感</b>（上升沿 ↑ 或下降沿 ↓）的双稳态器件，克服了电平触发的「空翻」现象。</p>' },
-          { title: '3.2.2 D 触发器', html: '<p>特性方程：<b><i>Q</i><sup><i>n</i>+1</sup> = <i>D</i></b>。时钟有效边沿到来时，将输入端 <i>D</i> 的数据打入输出端 <i>Q</i>，结构最简洁，广泛用于寄存器和移位寄存器。</p>' },
+          { title: '3.2.1 SR 触发器', html: '<p>仅在<b>时钟有效边沿</b>（上升沿 / 下降沿）改变状态。</p>' },
+          { title: '3.2.2 D 触发器', html: '<p>边沿触发，功能最简单、最常用；广泛用于<b>寄存器、移位寄存器、分频</b>。</p>' },
           {
             title: '3.2.3 JK 触发器',
             html: `
-              <p>特性方程：<b><i>Q</i><sup><i>n</i>+1</sup> = <i>J</i><span class="ov"><i>Q<sup>n</sup></i></span> + <span class="ov"><i>K</i></span><i>Q<sup>n</sup></i></b>。功能最全，无约束条件。</p>
+              <p>功能最全、<b>无约束条件</b>；把 <i>J</i> = <i>K</i> = <i>T</i> 即得 <b>T 触发器</b>；<i>J</i> = <i>K</i> = 1 即得 <b>T' 触发器</b>（每脉冲翻转一次）。</p>
               <div class="picker">
                 <div class="pick-row">
-                  <button class="pick" data-info="<b>J = 0, K = 0</b>：<i>Q</i><sup><i>n</i>+1</sup> = <i>Q<sup>n</sup></i>（<b>保持</b>原状态不变）">J=0, K=0</button>
-                  <button class="pick" data-info="<b>J = 0, K = 1</b>：<i>Q</i><sup><i>n</i>+1</sup> = 0（<b>置 0 / 复位</b>）">J=0, K=1</button>
-                  <button class="pick" data-info="<b>J = 1, K = 0</b>：<i>Q</i><sup><i>n</i>+1</sup> = 1（<b>置 1 / 置位</b>）">J=1, K=0</button>
-                  <button class="pick" data-info="<b>J = 1, K = 1</b>：<i>Q</i><sup><i>n</i>+1</sup> = <span class="ov"><i>Q<sup>n</sup></i></span>（<b>翻转 / 计数</b>）">J=1, K=1</button>
+                  <button class="pick" data-info="<b>J = 0, K = 0</b>：保持（<i>Q</i><sup><i>n</i>+1</sup> = <i>Q<sup>n</sup></i>）">J=0, K=0</button>
+                  <button class="pick" data-info="<b>J = 0, K = 1</b>：置 0（<i>Q</i><sup><i>n</i>+1</sup> = 0）">J=0, K=1</button>
+                  <button class="pick" data-info="<b>J = 1, K = 0</b>：置 1（<i>Q</i><sup><i>n</i>+1</sup> = 1）">J=1, K=0</button>
+                  <button class="pick" data-info="<b>J = 1, K = 1</b>：翻转（<i>Q</i><sup><i>n</i>+1</sup> = <span class="ov"><i>Q<sup>n</sup></i></span>），即 T' 触发器">J=1, K=1</button>
                 </div>
-                <div class="picker-out muted">👆 点击查看 JK 触发器在时钟边沿下的状态变化。</div>
+                <div class="picker-out muted">👆 点击查看 JK 触发器在不同输入下的工作状态。</div>
               </div>`
           },
-          { title: '3.2.4 触发器的应用和时间参数', html: '<p>重要时间参数：<b>建立时间 <i>t<sub>su</sub></i></b>（时钟边沿前数据必须提前稳定的时间）、<b>保持时间 <i>t<sub>h</sub></i></b>（时钟边沿后数据必须继续保持的时间）、<b>传输延迟 <i>t<sub>pd</sub></i></b>、最高工作频率 <i>f<sub>max</sub></i>。</p>' }
+          {
+            title: '3.2.4 触发器的应用和时间参数',
+            html: `
+              <p><b>五大应用</b>：1、用作并行数据寄存器；2、用作计数器；3、用作分频器；4、用作时序脉冲产生器；5、用作控制器。</p>
+              <table>
+                <thead><tr><th>时间参数</th><th>符号</th><th>含义</th></tr></thead>
+                <tbody>
+                  <tr><td>建立时间</td><td><i>t<sub>s</sub></i></td><td>时钟边沿到来前，输入必须稳定的最短时间</td></tr>
+                  <tr><td>保持时间</td><td><i>t<sub>h</sub></i></td><td>时钟边沿到来后，输入必须继续保持的时间</td></tr>
+                  <tr><td>时钟高电平宽度</td><td><i>t<sub>wh</sub></i></td><td>时钟信号保持为高电平的最小持续时间</td></tr>
+                  <tr><td>时钟低电平宽度</td><td><i>t<sub>wl</sub></i></td><td>时钟信号保持为低电平的最小持续时间</td></tr>
+                </tbody>
+              </table>`
+          }
         ]
       },
       {
         title: '3.3 寄存器和移位寄存器',
         subs: [
-          { title: '3.3.1 寄存器', html: '<p>由 <i>n</i> 个 D 触发器共用同一个时钟脉冲构成，用于一次性并行存入和保存 <i>n</i> 位二进制数据（如 74LS175）。</p>' },
-          { title: '3.3.2 移位寄存器', html: '<p>将多个触发器首尾级联，在时钟脉冲作用下数据逐位左移或右移（如 <b>74LS194</b> 双向移位寄存器），可用于<b>串/并转换</b>、环形计数器和序列信号发生器。</p>' }
+          {
+            title: '3.3.1 寄存器',
+            html: `
+              <ul>
+                <li><b>功能</b>：并行存放一组二进制数据。</li>
+                <li>通过<b>三态门</b>输出的寄存器便于组成数据总线。</li>
+                <li>由多个 <b>D 触发器</b>并联构成，共用时钟。</li>
+              </ul>`
+          },
+          {
+            title: '3.3.2 移位寄存器',
+            html: `
+              <ul>
+                <li><b>功能</b>：在时钟作用下，数据逐位左移或右移。</li>
+                <li><b>按方向</b>：单向移位 / 双向移位；典型芯片：<b>74LS194</b>（4 位双向通用移位寄存器）。</li>
+                <li><b>应用</b>：串/并转换、并/串转换、环形计数器、序列信号发生器。</li>
+              </ul>`
+          }
         ]
       },
       {
         title: '3.4 计数器',
         subs: [
-          { title: '3.4.1 同步计数器', html: '<p>所有触发器共用同一个时钟脉冲 <i>CP</i>，状态同时翻转，<b>工作速度快、无累积延迟</b>。</p>' },
-          { title: '3.4.2 异步计数器', html: '<p>低位触发器的输出作为高位触发器的时钟信号，电路简单但各级延迟累加，<b>速度较慢</b>，易产生译码毛刺。</p>' },
-          { title: '3.4.3 中规模集成计数器及应用', html: '<p>典型芯片：<b>74LS161</b>（4 位二进制同步加法计数器，异步清零、同步置数）与 <b>74LS160</b>（十进制）。通过<b>清零法</b>或<b>置数法</b>可构成任意进制（如 6 进制、24 进制、60 进制）计数器。</p>' }
+          {
+            title: '3.4.1 同步计数器',
+            html: `
+              <div class="callout"><b>计数器三种分类方式</b>
+                1. 按计数功能：加法计数器、减法计数器、可逆计数器；<br>
+                2. 按进位基数：二进制（模 2<sup><i>r</i></sup>）计数器、十进制计数器、任意进制计数器；<br>
+                3. 按进位方式：同步计数器（并行计数器）、异步计数器（串行计数器）。
+              </div>
+              <ul>
+                <li><b>核心特征</b>：所有触发器的时钟都与同一个时钟脉冲源连在一起，每个触发器的状态变化都与时钟脉冲同步。</li>
+                <li>常见结构：<b>环形计数器</b>、<b>扭环计数器</b>。</li>
+              </ul>`
+          },
+          {
+            title: '3.4.2 异步计数器',
+            html: `
+              <ul>
+                <li>低位触发器输出作为高位触发器的时钟，逐级翻转。</li>
+                <li>结构简单，但存在进位延迟，速度慢，易产生过渡状态。</li>
+                <li>常见电路：<b>异步模 16 计数器</b>、<b>异步模 10 计数器</b>。</li>
+              </ul>`
+          },
+          {
+            title: '3.4.3 中规模集成计数器及应用',
+            html: `
+              <ul>
+                <li><b>典型芯片</b>：<b>74LS161</b>（4 位同步二进制加法计数器，<b>异步清零</b>）；<b>74LS163</b>（4 位同步二进制加法计数器，<b>同步清零</b>）；<b>74LS160</b>（同步十进制加法计数器）。</li>
+                <li><b>四大功能</b>：1、可逆计数；2、预置功能；3、复位功能；4、时钟有效边沿的选择。</li>
+                <li><b>构成任意进制计数器的方法</b>：<b>预置法</b>（几乎所有中规模模数计数器都具有预置功能）与<b>复位法</b>（没有预置功能的中规模计数器都有清零端，可通过复位法构成任意进制计数器）。</li>
+              </ul>`
+          }
         ]
       },
       {
         title: '3.5 定时脉冲产生器',
         subs: [
-          { title: '3.5.1 时钟脉冲源电路', html: '<p>利用石英晶体振荡器或 <b>555 定时器</b>构成多谐振荡器，产生稳定频率的矩形波时钟信号。</p>' },
-          { title: '3.5.2 节拍脉冲产生器', html: '<p>由移位寄存器（环形计数器）或「计数器 + 译码器」构成，按顺序输出互不重叠的一组节拍脉冲，用于协调数字系统各步骤有序工作。</p>' },
-          { title: '3.5.3 数字钟', html: '<p>典型综合应用：<b>1 Hz 秒脉冲源 → 60 进制秒计数器 → 60 进制分计数器 → 24 进制时计数器 → 七段译码与数码管显示</b>。</p>' }
+          { title: '3.5.1 时钟脉冲源电路', html: '<p>提供脉冲的来源。<b>多谐振荡器</b>：无稳态，自激产生矩形脉冲，是时钟源。</p>' },
+          { title: '3.5.2 节拍脉冲产生器', html: '<p><b>作用</b>：把时钟脉冲转换成按顺序出现的节拍脉冲。<br><b>组成</b>：常由时钟脉冲源、环形脉冲发生器、译码逻辑、启停控制逻辑组成。</p>' },
+          { title: '3.5.3 数字钟', html: '<p>主要应用了<b>集成计数器的分频和级联功能</b>、<b>七段译码器的译码功能</b>以及<b>数码管的显示功能</b>。</p>' }
         ]
       },
       {
         title: '3.6 同步时序逻辑分析',
         subs: [
-          { title: '3.6.1 同步时序逻辑电路的描述工具', html: '<p>四大描述工具：<b>逻辑方程组</b>（驱动方程 + 状态方程 + 输出方程）、<b>状态转换表</b>、<b>状态转换图</b>、<b>时序图</b>。</p>' },
+          {
+            title: '3.6.1 同步时序逻辑电路的描述工具',
+            html: `
+              <ul>
+                <li><b>米里型（Mealy）</b>：输出是<b>输入变量和状态变量</b>的函数。</li>
+                <li><b>摩尔型（Moore）</b>：输出（<i>Z</i>）只是<b>状态变量</b>的函数，而和当时的输入无关；或根本没有 <i>Z</i> 输出，就以电路的状态作为输出。</li>
+                <li><b>状态表</b>：状态用<b>字母</b>表示；<b>状态转移表</b>：状态用<b>二进制代码</b>表示。</li>
+              </ul>`
+          },
           {
             title: '3.6.2 同步时序逻辑电路分析的一般方法',
             html: `
               <ol class="steps">
-                <li>从电路图写出各触发器的<b>驱动方程</b>（如 <i>J<sub>i</sub>, K<sub>i</sub></i> 或 <i>D<sub>i</sub></i>）及电路的<b>输出方程</b>。</li>
-                <li>将驱动方程代入触发器特性方程，得到<b>状态方程</b>。</li>
-                <li>列出<b>状态转换表</b>，并画出<b>状态转换图</b>。</li>
-                <li>分析电路逻辑功能，并检查能否<b>自启动</b>（无效状态能否回到有效循环）。</li>
+                <li>根据给定的逻辑图，写出<b>输出函数</b>和<b>激励函数</b>表达式。</li>
+                <li>建立<b>次态表达式</b>及<b>状态转移表</b>。</li>
+                <li>建立<b>状态表</b>及<b>状态图</b>。</li>
+                <li>分析输出序列与输入序列的关系，说明时序电路的逻辑功能。</li>
               </ol>`
           }
         ]
@@ -1184,22 +1381,31 @@ const CHAPTERS = [
       {
         title: '3.7 同步时序逻辑设计',
         subs: [
-          { title: '3.7.1 同步时序逻辑设计方法和步骤', html: '<p>步骤：<b>逻辑抽象建立原始状态表 → 状态化简（消除等价状态） → 状态编码 → 选定触发器并求驱动方程 → 画逻辑图并检查自启动</b>。</p>' },
-          { title: '3.7.2 建立原始状态表的方法', html: '<p>明确电路要记忆哪些历史条件（如序列检测器「101」需记录已收到的前缀：初始、收到1、收到10），确定每个现态在不同输入下的次态与输出（Mealy 型输出与输入有关，Moore 型输出仅与现态有关）。</p>' },
-          { title: '3.7.3 状态编码', html: '<p>若化简后有 <i>M</i> 个状态，则至少需要 <i>n</i> 个触发器满足 2<sup><i>n</i>−1</sup> &lt; <i>M</i> ≤ 2<sup><i>n</i></sup>。合理的状态分配（尽量让相邻状态编码只差一位）能显著简化后续组合逻辑电路。</p>' }
+          {
+            title: '3.7.1 同步时序逻辑设计方法和步骤',
+            html: `
+              <ol class="steps">
+                <li>根据设计要求建立<b>原始状态表</b>。</li>
+                <li>对原始状态表进行简化，以求得到一个<b>简化的状态表</b>。</li>
+                <li><b>状态编码</b>：简化状态表中每个状态用符号代表，必须分别用二进制代码代替，使状态表转换为状态转移表。</li>
+                <li>由状态转移表建立最简<b>激励函数</b>及<b>输出函数</b>表达式，完成组合逻辑设计。</li>
+                <li>画出逻辑图。</li>
+              </ol>`
+          },
+          { title: '3.7.2 建立原始状态表的方法', html: '<p><b>直接构图法基本思想</b>：根据文字描述的设计要求，先假定一个初态；从这个初态开始，每加入一个输入，就可确定其次态；该次态可能就是现态本身，也可能是已有的另一个状态，或是新增加的一个状态。</p>' },
+          { title: '3.7.3 状态编码', html: '<p>常见方法：<b>一对一法</b>和<b>计数器法</b>。</p>' }
         ]
       }
     ],
     quiz: [
-      { type: 'choice', q: '下列器件中，属于时钟边沿触发的是：', options: ['基本 SR 锁存器', '门控 D 锁存器', '边沿 D 触发器', '与非门'], answer: 2, explain: '锁存器是电平敏感，触发器（Flip-Flop）是时钟边沿敏感。' },
-      { type: 'fill', q: 'D 触发器的特性方程是 Q^(n+1) = ______。', answer: ['D'], explain: '时钟有效边沿到来时，输出次态直接等于输入 D。' },
-      { type: 'choice', q: '当 JK 触发器的输入 J = 1、K = 1 时，时钟边沿到来后触发器将：', options: ['保持不变', '置 0', '置 1', '翻转'], answer: 3, explain: 'J=K=1 时，Q^(n+1) = Q\'^n，即状态翻转。' },
-      { type: 'choice', q: '与异步计数器相比，同步计数器最突出的优点是：', options: ['电路更简单', '工作速度快、无累积延迟', '不用时钟信号', '功耗更低'], answer: 1, explain: '同步计数器所有触发器共用同一时钟同时翻转，没有级联累积延迟。' },
-      { type: 'fill', q: '若一个同步时序逻辑电路有 6 个有效状态，至少需要 ______ 个触发器。', answer: ['3', '3个'], explain: '2^2 = 4 < 6 ≤ 2^3 = 8，至少需要 3 个触发器。' },
-      { type: 'choice', q: '时序逻辑电路中，若输出既取决于电路的现态、又与输入信号有关，该电路属于：', options: ['Mealy 型', 'Moore 型', '组合逻辑型', '异步型'], answer: 0, explain: 'Mealy 型电路输出与现态和输入均有关；Moore 型输出仅与现态有关。' },
-      { type: 'choice', q: '用 74LS161（十六进制同步计数器）构成五进制计数器，常采用的方法是：', options: ['反馈清零法或反馈置数法', '直接级联', '提高时钟频率', '降低电源电压'], answer: 0, explain: '通过反馈清零（异步清零）或反馈置数（同步置数）可让计数器在计到 4 后跳回 0，构成五进制。' },
-      { type: 'choice', q: '74LS161 的异步清零端有效（RD = 0）时，计数器将：', options: ['立即清零，与时钟无关', '在下一个时钟上升沿清零', '保持原状态', '置入预置数'], answer: 0, explain: 'RD=0 为异步清零，无需等待时钟立即置零。' },
-      { type: 'choice', q: '分析同步时序逻辑电路时，将驱动方程代入触发器特性方程后得到的方程称为：', options: ['状态方程', '输出方程', '激励方程', '特征方程'], answer: 0, explain: '驱动方程代入特性方程得状态方程，用于描述次态与现态、输入的关系。' }
+      { type: 'choice', q: '门控 D 锁存器从根本上消除了基本 SR 锁存器「<i>S</i>、<i>R</i> 同时有效」的问题，其实现方法是：', options: ['去掉使能端 EN', '用一个 D 输入经反相后分别接 S、R', '把 S 和 R 直接短接', '增加一个时钟边沿检测电路'], answer: 1, explain: '用一个 D 输入，经反相后分别接 S、R，使 S 和 R 始终互补，从而消除约束状态。' },
+      { type: 'choice', q: '关于 JK 触发器的功能，将 <i>J</i> = <i>K</i> = 1 时，触发器每来一个有效时钟脉冲就翻转一次，此时构成的是：', options: ['D 触发器', 'SR 触发器', 'T′ 触发器', '门控锁存器'], answer: 2, explain: '把 J=K=T 得 T 触发器；把 J=K=1 得 T′ 触发器（每脉冲翻转一次）。' },
+      { type: 'fill', q: '在触发器的时间参数中，时钟边沿到来前，输入必须稳定的最短时间称为 ______（填中文名称）。', answer: ['建立时间'], explain: '建立时间 ts：时钟边沿到来前，输入必须稳定的最短时间；保持时间 th：边沿到来后必须继续保持的时间。' },
+      { type: 'choice', q: '下列芯片中，属于 4 位同步二进制加法计数器且为「同步清零」的是：', options: ['74LS161', '74LS163', '74LS160', '74LS194'], answer: 1, explain: '74LS161 为异步清零；74LS163 为同步清零；74LS160 为同步十进制；74LS194 为双向移位寄存器。' },
+      { type: 'choice', q: '时钟脉冲源电路中，无稳态、能自激产生矩形脉冲的电路是：', options: ['单稳态触发器', '多谐振荡器', '优先编码器', '数据选择器'], answer: 1, explain: '多谐振荡器无稳态，能自激产生矩形脉冲，用作时钟源。' },
+      { type: 'choice', q: '在同步时序逻辑电路中，输出只是状态变量的函数而与当时输入无关的电路称为：', options: ['米里型（Mealy）', '摩尔型（Moore）', '异步时序电路', '组合逻辑电路'], answer: 1, explain: '摩尔型输出只取决于状态变量；米里型输出是输入变量和状态变量的函数。' },
+      { type: 'choice', q: '关于「状态表」与「状态转移表」的区别，正确的是：', options: ['两者完全相同', '状态表用字母表示状态，状态转移表用二进制代码表示状态', '状态表用二进制表示，状态转移表用字母表示', '状态表只能描述组合逻辑'], answer: 1, explain: '状态表中状态用字母/符号表示，经状态编码用二进制代码代替后变为状态转移表。' },
+      { type: 'fill', q: '同步时序逻辑设计中，状态编码的两种常见方法是「一对一法」和 ______。', answer: ['计数器法'], explain: '状态编码的常见方法有一对一法和计数器法。' }
     ]
   }
 ];
@@ -1490,7 +1696,7 @@ const CHAPTERS = [
 
   /* ---------- 练习系统 ---------- */
   const norm = s => String(s).trim().toLowerCase().replace(/[\s()（）]/g, '');
-  function answerText(q) { return q.type === 'fill' ? esc([].concat(q.answer)[0]) : `${'ABCDEF'[q.answer]}. ${q.options[q.answer]}`; }
+  function answerText(q) { return q.type === 'fill' ? [].concat(q.answer)[0] : `${'ABCDEF'[q.answer]}. ${q.options[q.answer]}`; }
   function renderQuiz(root, c, focusIdx) {
     const rec = (store.get()[c.id]) || {};
     root.innerHTML = `
@@ -1498,12 +1704,12 @@ const CHAPTERS = [
       <div id="qcelebrate"></div>
       ${c.quiz.map((q, i) => `
         <div class="qcard" data-i="${i}" id="q-${i}">
-          <div class="qtitle"><span class="qno">${i + 1}</span><span class="qtype">${q.type === 'fill' ? '填空' : '单选'}</span>${esc(q.q)}</div>
+          <div class="qtitle"><span class="qno">${i + 1}</span><span class="qtype">${q.type === 'fill' ? '填空' : '单选'}</span>${q.q}</div>
           ${q.type === 'fill'
             ? `<div class="qfill"><input class="input" placeholder="输入答案，按回车提交" /><button class="btn btn-primary btn-sm" type="button" data-submit>提交</button></div>`
-            : `<div class="qopts">${q.options.map((o, k) => `<button class="qopt" type="button" data-k="${k}"><span class="qkey">${'ABCDEF'[k]}</span><span>${esc(o)}</span></button>`).join('')}</div>`}
+            : `<div class="qopts">${q.options.map((o, k) => `<button class="qopt" type="button" data-k="${k}"><span class="qkey">${'ABCDEF'[k]}</span><span>${o}</span></button>`).join('')}</div>`}
           <div class="qresult" hidden></div>
-          <details class="qpeek"><summary>查看答案与解析</summary><div style="margin-top:6px"><b>答案：</b>${answerText(q)}<br>${esc(q.explain)}</div></details>
+          <details class="qpeek"><summary>查看答案与解析</summary><div style="margin-top:6px"><b>答案：</b>${answerText(q)}<br>${q.explain}</div></details>
         </div>`).join('')}`;
 
     const updScore = () => {
@@ -1523,7 +1729,7 @@ const CHAPTERS = [
       }
       card.classList.toggle('ok', ok); card.classList.toggle('bad', !ok);
       const res = $('.qresult', card); res.hidden = false; res.className = 'qresult ' + (ok ? 'ok' : 'bad');
-      res.innerHTML = (ok ? '✅ 回答正确！' : `❌ 回答错误。正确答案：<b>${answerText(q)}</b>`) + `<div class="exp">💡 解析：${esc(q.explain)}</div>`;
+      res.innerHTML = (ok ? '✅ 回答正确！' : `❌ 回答错误。正确答案：<b>${answerText(q)}</b>`) + `<div class="exp">💡 解析：${q.explain}</div>`;
       $('.qpeek', card).hidden = true;
       if (!silent) { const p = store.get(); p[c.id] = p[c.id] || {}; p[c.id][i] = { ok, v: val }; store.set(p); }
     };
@@ -1565,7 +1771,7 @@ const CHAPTERS = [
         </div>
         ${shown.map(x => `<div class="list-row">${x.state === 'open' ? I.issue : x.state === 'done' ? I.done : I.bad}
           <div class="lr-main">
-            <a class="lr-title" href="#/ch/${x.c.id}/quiz/${x.i}">${esc(x.q.q)}</a>
+            <a class="lr-title" href="#/ch/${x.c.id}/quiz/${x.i}">${x.q.q}</a>
             <div class="lr-meta">第${x.c.id}章 ${esc(x.c.title)} · ${x.q.type === 'fill' ? '填空' : '单选'} · 由 ${esc(x.c.author)} 编写</div>
           </div></div>`).join('') || '<div style="padding:24px;text-align:center" class="muted">暂无题目</div>'}
       </div>`;
@@ -1607,7 +1813,7 @@ const CHAPTERS = [
               <div class="lr-meta">已答 ${t.answered}/${t.total} · 答对 ${t.correct} · 负责人 ${esc(c.author)}</div>
               <div class="progress" style="margin-top:6px;max-width:360px"><span style="width:${pct(t.correct, t.total)}%"></span></div>
               <details><summary>查看每题结果</summary><ul class="run-steps">
-                ${c.quiz.map((q, i) => `<li>${!rec[i] ? I.idle : rec[i].ok ? I.ok : I.bad}<a href="#/ch/${c.id}/quiz/${i}">${i + 1}. ${esc(q.q)}</a></li>`).join('')}
+                ${c.quiz.map((q, i) => `<li>${!rec[i] ? I.idle : rec[i].ok ? I.ok : I.bad}<a href="#/ch/${c.id}/quiz/${i}">${i + 1}. ${q.q}</a></li>`).join('')}
               </ul></details>
             </div>
             <a class="btn btn-sm" href="#/ch/${c.id}/quiz">${t.answered ? '继续' : '开始'}</a></div>`;
