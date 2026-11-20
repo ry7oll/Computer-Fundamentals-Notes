@@ -158,6 +158,7 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      padding-top: 57px;
     }
     body.drawer-open .page-wrap {
       pointer-events: none;
@@ -166,8 +167,10 @@
 
     /* ---------- 顶部全局 Header（固定在顶部，滑动时也可搜索） ---------- */
     .gh-header {
-      position: sticky;
+      position: fixed;
       top: 0;
+      left: 0;
+      right: 0;
       z-index: 70;
       display: flex;
       align-items: center;
@@ -411,8 +414,8 @@
     .topics { display: flex; flex-wrap: wrap; gap: 6px; }
     .topic { background: var(--accent-subtle); color: var(--accent); font-size: 12px; font-weight: 500; padding: 0 10px; line-height: 22px; border-radius: 2em; }
     .topic:hover { background: var(--accent-emphasis); color: #fff; text-decoration: none; }
-    .contrib { display: flex; flex-wrap: wrap; gap: 10px; }
-    .contrib a { display: flex; align-items: center; gap: 6px; color: var(--fg); }
+    .contrib { display: flex; flex-direction: column; gap: 10px; }
+    .contrib a { display: flex; align-items: center; gap: 8px; color: var(--fg); font-weight: 500; }
 
     /* ---------- 章节页（包含本节快速跳转目录 + 正文） ---------- */
     .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 15px; margin-bottom: 14px; flex-wrap: wrap; }
@@ -716,10 +719,260 @@ const TEAM = [
 /* =========================================================
    2. 课程章节数据（完全按大纲生成 第1章 ~ 第3章）
    ========================================================= */
+const BOOKS = [
+  {
+    id: 'co',
+    letter: 'C',
+    color: '#942126',
+    title: '计算机组成原理',
+    desc: '计算机系统概述、硬件与软件、性能评价与层次结构'
+  },
+  {
+    id: 'dl',
+    letter: 'D',
+    color: '#00478D',
+    title: '数字逻辑',
+    desc: '开关理论基础、组合逻辑与时序逻辑'
+  }
+];
+
 const CHAPTERS = [
+  /* -------------------- 计算机组成原理 · 第1章 概论 -------------------- */
+  {
+    id: 101,
+    book: 'co',
+    no: 1,
+    title: '概论（计算机系统概述）',
+    author: 'ry7oll',
+    updated: '2026-11-21',
+    summary: '计算机分类、发展简史、硬件与软件组成、性能评价与层次结构',
+    intro: '本章总结《计算机组成原理》第一章核心知识点：计算机的分类与发展简史、硬件与软件组成、系统性能评价指标以及冯·诺依曼体系与多级层次结构。',
+    sections: [
+      {
+        title: '1.1 计算机的分类',
+        subs: [
+          {
+            title: '1.1.1 按使用范围、规模性能和处理方式分类',
+            html: `
+              <div class="tabs">
+                <div data-tab="按使用范围分">
+                  <ul>
+                    <li><b>通用计算机</b>：适应性强，可运行多种程序，如个人计算机、服务器。</li>
+                    <li><b>专用计算机</b>：为特定场景设计，效率高、功能固定，如导弹控制、工业控制器。</li>
+                  </ul>
+                </div>
+                <div data-tab="按规模和性能分">
+                  <p><b>超级计算机、大型机、小型机、微型机（个人计算机）、嵌入式计算机</b>。</p>
+                  <div class="callout tip"><b>重点</b>其中<b>嵌入式计算机</b>应用极广，手机、智能家电都属于这一类。</div>
+                </div>
+                <div data-tab="按数据处理方式分">
+                  <p><b>数字计算机</b>、<b>模拟计算机</b>、<b>混合计算机</b>。</p>
+                </div>
+              </div>`
+          }
+        ]
+      },
+      {
+        title: '1.2 计算机的发展简史',
+        subs: [
+          {
+            title: '1.2.1 计算机的五代变化',
+            html: `
+              <ol>
+                <li><b>第一代</b>：电子管计算机</li>
+                <li><b>第二代</b>：晶体管计算机</li>
+                <li><b>第三代</b>：中小规模集成电路计算机</li>
+                <li><b>第四代</b>：大规模、超大规模集成电路计算机（当前个人计算机属于这一代）</li>
+                <li><b>第五代</b>：新一代智能计算机，向<b>并行处理、人工智能</b>方向发展</li>
+              </ol>`
+          },
+          {
+            title: '1.2.2 半导体存储器的发展',
+            html: '<p>从<b>磁芯存储器</b>逐步过渡到<b>半导体存储器</b>，容量变大、速度提升、价格下降。</p>'
+          },
+          {
+            title: '1.2.3 微处理器的发展',
+            html: `
+              <ul>
+                <li><b>微处理器</b>就是把 CPU 集成在一块芯片上。</li>
+                <li><b>摩尔定律</b>：集成电路上晶体管数量大约每 <b>18 个月</b>翻一番，性能随之提升。</li>
+              </ul>`
+          },
+          {
+            title: '1.2.4 国产处理器技术的发展历程',
+            html: '<p>国产 CPU 主要有<b>龙芯、申威、飞腾、鲲鹏</b>等，在服务器、工控、桌面端逐步落地，实现<b>自主可控</b>。</p>'
+          }
+        ]
+      },
+      {
+        title: '1.3 计算机的硬件',
+        subs: [
+          {
+            title: '1.3.1 硬件组成要素',
+            html: `
+              <ul>
+                <li><b>五大硬件部件</b>：运算器、存储器、控制器、输入设备、输出设备。</li>
+                <li><b>运算器和控制器</b>合称 <b>CPU</b>。</li>
+                <li>此外还有<b>适配器（I/O 接口）</b>，用于连接主机和外部 I/O 设备，完成信号转换和速度匹配。</li>
+              </ul>`
+          },
+          {
+            title: '1.3.2 运算器',
+            html: '<p>负责<b>算术运算</b>（加减乘除）和<b>逻辑运算</b>（与或非），核心部件是 <b>ALU（算术逻辑单元）</b>，可临时存放运算数据。</p>'
+          },
+          {
+            title: '1.3.3 存储器',
+            html: `
+              <ul>
+                <li>存放程序和数据，分为<b>主存（内存）</b>和<b>辅存（外存，如硬盘、U 盘）</b>。</li>
+                <li>主存<b>速度快，断电后信息丢失</b>；辅存<b>容量大，断电后信息不丢失</b>。</li>
+              </ul>`
+          },
+          {
+            title: '1.3.4 控制器',
+            html: `
+              <ul>
+                <li><b>计算程序</b>：每一个基本操作称为一条<b>指令</b>，而解算某一问题的一串指令序列称为该问题的计算程序，简称为<b>程序</b>。</li>
+                <li><b>指令形式</b>：每条指令应当明确告诉控制器，从存储器的哪个单元取数，并进行何种操作。指令内容由两部分组成：<b>操作码</b>（操作的性质）和<b>地址码</b>（操作数的地址）。</li>
+              </ul>`
+          },
+          {
+            title: '1.3.5 适配器与输入/输出设备',
+            html: `
+              <ul>
+                <li><b>适配器</b>：连接主机与外部设备，做信号转换和速度匹配。</li>
+                <li><b>输入设备</b>：把外部信息送入计算机，如键盘、鼠标、扫描仪。</li>
+                <li><b>输出设备</b>：把处理结果输出给人看，如显示器、打印机。</li>
+              </ul>`
+          }
+        ]
+      },
+      {
+        title: '1.4 计算机的软件',
+        subs: [
+          {
+            title: '1.4.1 软件的组成与分类',
+            html: `
+              <table>
+                <thead><tr><th>分类</th><th>作用</th><th>典型举例</th></tr></thead>
+                <tbody>
+                  <tr><td><b>系统软件</b></td><td>管理计算机底层资源，支撑硬件运行</td><td>操作系统 OS、编译程序、汇编程序、数据库管理系统</td></tr>
+                  <tr><td><b>应用软件</b></td><td>面向用户业务</td><td>微信、Office、游戏、各类专业工具</td></tr>
+                </tbody>
+              </table>`
+          },
+          {
+            title: '1.4.2 软件的发展演变',
+            html: `
+              <ul>
+                <li><b>语言方面</b>：机器语言 → 汇编语言 → 高级语言。</li>
+                <li><b>系统方面</b>：单道程序 → 多道程序 → 分时操作系统。</li>
+              </ul>`
+          }
+        ]
+      },
+      {
+        title: '1.5 计算机系统性能评价',
+        subs: [
+          {
+            title: '1.5.1 计算机的性能指标',
+            html: `
+              <p><b>运算速度相关指标</b>：</p>
+              <table>
+                <thead><tr><th>指标</th><th>含义 / 说明</th></tr></thead>
+                <tbody>
+                  <tr><td><b>主频（时钟频率）</b></td><td>单位 GHz，是时钟周期的倒数，主频越高理论速度越快</td></tr>
+                  <tr><td><b>MIPS</b></td><td>每秒百万条指令</td></tr>
+                  <tr><td><b>FLOPS</b></td><td>衡量浮点运算能力</td></tr>
+                  <tr><td><b>CPI</b></td><td>每条指令平均所需的时钟周期数</td></tr>
+                </tbody>
+              </table>`
+          },
+          {
+            title: '1.5.2 计算机系统的测试基准',
+            html: '<p>使用<b>基准测试程序</b>综合评估整机性能，例如 <b>SPEC 测试套件</b>，用真实负载评估，避免单一理论指标带来的片面判断。</p>'
+          }
+        ]
+      },
+      {
+        title: '1.6 计算机系统的层次结构',
+        subs: [
+          {
+            title: '1.6.1 冯诺依曼体系结构',
+            html: `
+              <div class="callout key"><b>基本特点</b>
+                (1) 在机器内部，指令和数据均以<b>二进制码</b>表示。<br>
+                (2) 计算机由<b>运算器、控制器、存储器、输入设备和输出设备</b>五部分组成。<br>
+                (3) 指令由<b>操作码</b>和<b>地址码</b>组成。<br>
+                (4) 采用<b>存储程序</b>方式。
+              </div>
+              <div class="picker">
+                <div class="pick-row">
+                  <button class="pick" data-info="<b>① 运算器</b>：能进行算术和逻辑运算以及附加操作。">运算器</button>
+                  <button class="pick" data-info="<b>② 控制器</b>：能自动执行指令。">控制器</button>
+                  <button class="pick" data-info="<b>③ 存储器（内存）</b>：不仅能存放数据，也能存放指令。对存储器本身而言，二者没有区别，都是由 0 和 1 组成的代码序列。">存储器</button>
+                  <button class="pick" data-info="<b>④ 输入/输出设备</b>：保证人与计算机的相互通信。">输入/输出设备</button>
+                </div>
+                <div class="picker-out muted">👆 点击查看冯·诺依曼结构各部件功能。</div>
+              </div>`
+          },
+          {
+            title: '1.6.2 哈佛结构和改进的哈佛结构',
+            html: `
+              <div class="tabs">
+                <div data-tab="冯诺依曼结构"><p>指令和数据<b>共用同一个存储器、同一套总线</b>。</p></div>
+                <div data-tab="哈佛结构"><p>指令存储器和数据存储器<b>相互独立，有两套总线</b>，可以同时取指令和读数据，速度更快，常用于 <b>DSP、单片机</b>。</p></div>
+                <div data-tab="改进的哈佛结构"><p>在两者之间做折中，部分资源共享。</p></div>
+              </div>`
+          },
+          {
+            title: '1.6.3 非诺依曼化',
+            html: '<p>打破指令串行执行方式，如<b>数据流计算机</b>、<b>并行计算体系</b>。</p>'
+          },
+          {
+            title: '1.6.4 多级组成的计算机系统',
+            html: `
+              <ul>
+                <li><b>分层（由低到高）</b>：硬件层 → 微程序层 → 机器语言层 → 汇编语言层 → 高级语言层。</li>
+                <li>上层依赖下层，逐层向上抽象，屏蔽底层硬件细节。</li>
+              </ul>`
+          },
+          {
+            title: '1.6.5 软件与硬件的逻辑等价性',
+            html: `
+              <ul>
+                <li>任何由软件实现的操作，理论上都可以用硬件实现；硬件实现的操作，也可以用软件模拟。</li>
+                <li><b>硬件</b>：速度快、成本高；<b>软件</b>：灵活、速度慢。实际设计是两者的取舍权衡。</li>
+              </ul>`
+          },
+          {
+            title: '1.6.6 计算机系统结构、计算机组成与计算机实现',
+            html: `
+              <ul>
+                <li><b>计算机系统结构</b>：程序员所看到的计算机系统属性，如指令集、寻址方式。</li>
+                <li><b>计算机组成</b>：体系结构的逻辑实现，即各硬件部件如何连接。</li>
+                <li><b>计算机实现</b>：硬件的物理实现，涉及芯片、电路板等物理器件。</li>
+              </ul>`
+          }
+        ]
+      }
+    ],
+    quiz: [
+      { type: 'choice', q: '手机和智能家电通常属于按规模和性能分类中的哪一类计算机？', options: ['大型机', '小型机', '微型机', '嵌入式计算机'], answer: 3, explain: '嵌入式计算机应用极广，手机、智能家电都属于这一类。' },
+      { type: 'fill', q: '摩尔定律指出，集成电路上晶体管数量大约每 ______ 个月翻一番。', answer: ['18', '18个月'], explain: '摩尔定律：集成电路上晶体管数量大约每 18 个月翻一番，性能随之提升。' },
+      { type: 'choice', q: '在计算机硬件组成中，负责连接主机和外部 I/O 设备、完成信号转换和速度匹配的部件是：', options: ['运算器 ALU', '控制器', '适配器（I/O 接口）', '辅存'], answer: 2, explain: '适配器（I/O 接口）用于连接主机和外部 I/O 设备，完成信号转换和速度匹配。' },
+      { type: 'choice', q: '一条计算机指令的内容通常由哪两部分组成？', options: ['主频和周期', '操作码和地址码', '输入和输出', '主存和辅存'], answer: 1, explain: '指令由操作码（说明操作性质）和地址码（说明操作数地址）两部分组成。' },
+      { type: 'choice', q: '下列性能指标中，表示「每条指令平均所需的时钟周期数」的是：', options: ['主频', 'MIPS', 'FLOPS', 'CPI'], answer: 3, explain: 'CPI 为每条指令平均所需的时钟周期数；MIPS 为每秒百万条指令；FLOPS 衡量浮点运算能力。' },
+      { type: 'choice', q: '与冯·诺依曼结构相比，哈佛结构的显著特点是：', options: ['指令和数据共用同一存储器', '指令存储器和数据存储器相互独立，有两套总线', '不使用二进制编码', '只能运行单道程序'], answer: 1, explain: '哈佛结构将指令存储器和数据存储器分离，采用两套独立总线，可同时取指令和读数据，常用于 DSP 和单片机。' },
+      { type: 'choice', q: '关于「软件与硬件的逻辑等价性」，下列说法正确的是：', options: ['软件实现速度快、成本高', '硬件灵活、速度慢', '任何软件实现的操作理论上都可用硬件实现，实际设计需在速度与成本间权衡', '硬件和软件无法互相替代'], answer: 2, explain: '软硬件在逻辑功能上等价：硬件速度快、成本高；软件灵活、速度慢，实际设计需要取舍权衡。' },
+      { type: 'choice', q: '程序员所看到的计算机系统属性（如指令集、寻址方式）属于：', options: ['计算机系统结构', '计算机组成', '计算机实现', '微程序层'], answer: 0, explain: '计算机系统结构是程序员看到的系统属性；计算机组成是逻辑实现；计算机实现是芯片电路等物理实现。' }
+    ]
+  },
   /* -------------------- 第1章 开关理论基础 -------------------- */
   {
     id: 1,
+    book: 'dl',
+    no: 1,
     title: '开关理论基础',
     author: 'ry7oll',
     updated: '2026-11-21',
@@ -1112,6 +1365,8 @@ const CHAPTERS = [
   /* -------------------- 第2章 组合逻辑 -------------------- */
   {
     id: 2,
+    book: 'dl',
+    no: 2,
     title: '组合逻辑',
     author: 'NiLuo',
     updated: '2026-11-21',
@@ -1276,6 +1531,8 @@ const CHAPTERS = [
   /* -------------------- 第3章 时序逻辑 -------------------- */
   {
     id: 3,
+    book: 'dl',
+    no: 3,
     title: '时序逻辑',
     author: '慟',
     updated: '2026-11-21',
@@ -1492,6 +1749,9 @@ const CHAPTERS = [
   };
   const member = name => TEAM.find(m => m.name === name) || { name, color: '#6e7781' };
   const avatar = (name, cls = '') => `<span class="avatar ${cls}" style="background:${member(name).color}">${esc(String(name).slice(0, 1).toUpperCase())}</span>`;
+  const getBook = id => BOOKS.find(b => b.id === id) || BOOKS[0];
+  const bookBadge = b => `<span class="avatar" style="background:${b.color}">${esc(b.letter)}</span>`;
+  const chNum = c => (c.no !== undefined ? c.no : c.id);
   const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
 
   const svg = (cls, inner) => `<svg class="ic ${cls}" viewBox="0 0 16 16" aria-hidden="true">${inner}</svg>`;
@@ -1535,21 +1795,26 @@ const CHAPTERS = [
       </div>
       <nav class="tree">
         <a class="tree-item ${view === 'code' ? 'active' : ''}" href="#/">${I.file}<span class="tree-label">课程总览 · README</span></a>`;
-    CHAPTERS.forEach(c => {
-      const open = c.id === chId;
-      const st = chapterStats(c, p);
-      const badge = st.correct === st.total ? '<span class="tree-badge ok">✓</span>' : st.answered ? `<span class="tree-badge ing">${st.correct}/${st.total}</span>` : '';
-      h += `<div class="tree-folder ${open ? 'open' : ''}">
-          <div class="tree-row ${open && (sub === undefined || sub === '') ? 'active' : ''}" data-href="#/ch/${c.id}">${I.caret}${I.folder}<span class="tree-label">第${c.id}章 ${esc(c.title)}</span>${badge}</div>
-          <div class="tree-children">
-            ${c.sections.map((sec, i) => `
-              <div>
-                <a class="tree-item ${open && sub === String(i) ? 'active' : ''}" href="#/ch/${c.id}/${i}">${I.file}<span class="tree-label">${esc(sec.title)}</span></a>
-                <div class="tree-sublist">${sec.subs.map((sb, j) => `<a class="tree-sub" href="#/ch/${c.id}/${i}/${j}">${esc(sb.title)}</a>`).join('')}</div>
-              </div>`).join('')}
-            <a class="tree-item ${open && sub === 'quiz' ? 'active' : ''}" href="#/ch/${c.id}/quiz">${I.issue}<span class="tree-label">课后练习（${st.correct}/${st.total}）</span></a>
-          </div>
-        </div>`;
+    BOOKS.forEach(b => {
+      const bChs = CHAPTERS.filter(c => c.book === b.id);
+      if (!bChs.length) return;
+      h += `<div style="display:flex;align-items:center;gap:6px;padding:10px 8px 4px;font-size:12px;font-weight:600;color:var(--fg-muted)">${bookBadge(b)}<span>${esc(b.title)}</span></div>`;
+      bChs.forEach(c => {
+        const open = c.id === chId;
+        const st = chapterStats(c, p);
+        const badge = st.correct === st.total ? '<span class="tree-badge ok">✓</span>' : st.answered ? `<span class="tree-badge ing">${st.correct}/${st.total}</span>` : '';
+        h += `<div class="tree-folder ${open ? 'open' : ''}">
+            <div class="tree-row ${open && (sub === undefined || sub === '') ? 'active' : ''}" data-href="#/ch/${c.id}">${I.caret}${I.folder}<span class="tree-label">第${chNum(c)}章 ${esc(c.title)}</span>${badge}</div>
+            <div class="tree-children">
+              ${c.sections.map((sec, i) => `
+                <div>
+                  <a class="tree-item ${open && sub === String(i) ? 'active' : ''}" href="#/ch/${c.id}/${i}">${I.file}<span class="tree-label">${esc(sec.title)}</span></a>
+                  <div class="tree-sublist">${sec.subs.map((sb, j) => `<a class="tree-sub" href="#/ch/${c.id}/${i}/${j}">${esc(sb.title)}</a>`).join('')}</div>
+                </div>`).join('')}
+              <a class="tree-item ${open && sub === 'quiz' ? 'active' : ''}" href="#/ch/${c.id}/quiz">${I.issue}<span class="tree-label">课后练习（${st.correct}/${st.total}）</span></a>
+            </div>
+          </div>`;
+      });
     });
     h += `<a class="tree-item ${view === 'quiz' ? 'active' : ''}" href="#/quiz">${I.issue}<span class="tree-label">全部练习题</span></a>
           <a class="tree-item ${view === 'team' ? 'active' : ''}" href="#/team"><span class="ico ic-team" aria-hidden="true"></span><span class="tree-label">小组分工说明</span></a>
@@ -1628,19 +1893,19 @@ const CHAPTERS = [
         const lst = chapterStats(lc, p);
         if (lst.correct < lst.total) {
           if (last.secIdx === 'quiz') {
-            return { href: `#/ch/${lc.id}/quiz`, text: `▶ 继续练习第${lc.id}章` };
+            return { href: `#/ch/${lc.id}/quiz`, text: `▶ 继续练习 · ${getBook(lc.book).title} 第${chNum(lc)}章` };
           }
           if (last.secIdx !== undefined && last.secIdx !== '' && lc.sections[+last.secIdx]) {
             const secNum = lc.sections[+last.secIdx].title.split(' ')[0];
-            return { href: last.hash || `#/ch/${lc.id}/${last.secIdx}`, text: `▶ 继续学习第${lc.id}章 ${secNum}` };
+            return { href: last.hash || `#/ch/${lc.id}/${last.secIdx}`, text: `▶ 继续学习 · ${getBook(lc.book).title} ${secNum}` };
           }
-          return { href: `#/ch/${lc.id}`, text: `▶ 继续学习第${lc.id}章` };
+          return { href: `#/ch/${lc.id}`, text: `▶ 继续学习 · ${getBook(lc.book).title} 第${chNum(lc)}章` };
         }
       }
     }
     const pst = chapterStats(pendingCh, p);
     const verb = pst.answered > 0 ? '继续学习' : '开始学习';
-    return { href: `#/ch/${pendingCh.id}`, text: `▶ ${verb}第${pendingCh.id}章` };
+    return { href: `#/ch/${pendingCh.id}`, text: `▶ ${verb} · ${getBook(pendingCh.book).title} 第${chNum(pendingCh)}章` };
   }
 
   /* ---------- 首页 ---------- */
@@ -1659,25 +1924,27 @@ const CHAPTERS = [
             <span class="spacer"></span>
             <a class="btn btn-primary" href="${act.href}">${esc(act.text)}</a>
           </div>
-          <div class="box">
-            <div class="box-header">${avatar('ry7oll')}<b>ry7oll</b><span class="muted">同步《数字逻辑 / 开关理论》全部章节目录</span><span class="spacer"></span><span class="muted">2026-11-18</span></div>
-            ${CHAPTERS.map(c => {
-              const st = chapterStats(c);
-              return `<div class="file-row">${I.folder}
-                <div class="fname"><a href="#/ch/${c.id}">第${c.id}章 ${esc(c.title)}</a></div>
-                <div class="fmsg">${avatar(c.author)} ${esc(c.summary)}</div>
-                <div class="fdate">${st.correct}/${st.total} ✓</div></div>`;
-            }).join('')}
-            <div class="file-row">${I.file}<div class="fname"><a href="#/team">小组分工说明.md</a></div><div class="fmsg">4 位成员分工与具体贡献</div><div class="fdate">${TEAM.length} 人</div></div>
-          </div>
+          ${BOOKS.map(b => {
+            const bChs = CHAPTERS.filter(c => c.book === b.id);
+            return `<div class="box">
+              <div class="box-header">${bookBadge(b)}<b>${esc(b.title)}</b><span class="muted">${esc(b.desc)}</span><span class="spacer"></span><span class="muted">${bChs.length} 章</span></div>
+              ${bChs.map(c => {
+                const st = chapterStats(c);
+                return `<div class="file-row">${I.folder}
+                  <div class="fname"><a href="#/ch/${c.id}">第${chNum(c)}章 ${esc(c.title)}</a></div>
+                  <div class="fmsg">${esc(c.summary)}</div>
+                  <div class="fdate">${st.correct}/${st.total} ✓</div></div>`;
+              }).join('')}
+            </div>`;
+          }).join('')}
           <div class="box">
             <div class="box-header"><span class="ico ic-chapter" aria-hidden="true"></span><b>README.md</b></div>
             <article class="markdown-body">
-              <h1>《数字逻辑 / 开关理论》课堂笔记</h1>
+              <h1>《计算机组成原理 &amp; 数字逻辑》课堂笔记</h1>
               <p class="lead">点击左上角 <b>☰</b> 按钮可从左侧弹出高亮章节目录（背景自动虚化暗淡，方便专注选章）。页面支持术语悬停提示、例题折叠解析、选项卡、逻辑门与卡诺图交互、以及课后练习即时判题。</p>
               <h2>课程章节结构</h2>
-              <table><thead><tr><th>章节</th><th>核心节次</th><th>小节数</th><th>负责人</th></tr></thead><tbody>
-                ${CHAPTERS.map(c => `<tr><td><a href="#/ch/${c.id}">第${c.id}章 ${esc(c.title)}</a></td><td>${c.sections.map(x => esc(x.title)).join('、')}</td><td>${c.sections.reduce((m, s) => m + s.subs.length, 0)}</td><td>${avatar(c.author)} ${esc(c.author)}</td></tr>`).join('')}
+              <table><thead><tr><th style="white-space:nowrap;min-width:158px">课程</th><th style="white-space:nowrap">章节</th><th>核心节次</th><th style="white-space:nowrap">小节数</th></tr></thead><tbody>
+                ${CHAPTERS.map(c => `<tr><td style="white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap">${bookBadge(getBook(c.book))}<span>${esc(getBook(c.book).title)}</span></span></td><td style="white-space:nowrap"><a href="#/ch/${c.id}">第${chNum(c)}章 ${esc(c.title)}</a></td><td>${c.sections.map(x => esc(x.title)).join('、')}</td><td>${c.sections.reduce((m, s) => m + s.subs.length, 0)}</td></tr>`).join('')}
               </tbody></table>
             </article>
           </div>
@@ -1713,31 +1980,31 @@ const CHAPTERS = [
     main.innerHTML = `
       <div class="breadcrumb">
         <button class="btn btn-sm" type="button" id="chMenuBtn"><span class="ico ic-menu" aria-hidden="true"></span>目录</button>
-        <a href="#/">计算机系统基础笔记</a> / <b>第${c.id}章 ${esc(c.title)}</b>
+        <a href="#/">计算机系统基础笔记</a> / <span>${esc(getBook(c.book).title)}</span> / <b>第${chNum(c)}章 ${esc(c.title)}</b>
       </div>
       <div class="box">
         <div class="box-header">
           <div class="seg"><a class="${mode === 'notes' ? 'on' : ''}" href="#/ch/${c.id}">笔记正文</a><a class="${mode === 'quiz' ? 'on' : ''}" href="#/ch/${c.id}/quiz">课后练习 <span class="counter">${c.quiz.length}</span></a></div>
           <span class="spacer"></span>
-          ${avatar(c.author)}<span class="muted">${esc(c.author)} · ${c.sections.length} 节 · ${c.quiz.length} 题</span>
+          <span class="muted">${c.sections.length} 节 · ${c.quiz.length} 题</span>
         </div>
         ${mode === 'notes' ? `<div class="sec-pills">${c.sections.map((s, i) => `<a href="#/ch/${c.id}/${i}" class="${secIdx === String(i) ? 'on' : ''}">${esc(s.title)}</a>`).join('')}</div>` : ''}
         <article class="markdown-body" id="content"></article>
       </div>
       <div class="pager">
-        ${prev ? `<a href="#/ch/${prev.id}"><small>← 上一章</small>第${prev.id}章 ${esc(prev.title)}</a>` : ''}
-        ${next ? `<a class="next" href="#/ch/${next.id}"><small>下一章 →</small>第${next.id}章 ${esc(next.title)}</a>` : ''}
+        ${prev ? `<a href="#/ch/${prev.id}"><small>← 上一章 · ${esc(getBook(prev.book).title)}</small>第${chNum(prev)}章 ${esc(prev.title)}</a>` : ''}
+        ${next ? `<a class="next" href="#/ch/${next.id}"><small>下一章 · ${esc(getBook(next.book).title)} →</small>第${chNum(next)}章 ${esc(next.title)}</a>` : ''}
       </div>`;
     $('#chMenuBtn').onclick = openDrawer;
     const content = $('#content');
     if (mode === 'notes') {
-      content.innerHTML = `<h1>第${c.id}章 ${esc(c.title)}</h1><p class="lead">${esc(c.intro)}</p>` +
+      content.innerHTML = `<h1>${esc(getBook(c.book).title)} · 第${chNum(c)}章 ${esc(c.title)}</h1><p class="lead">${esc(c.intro)}</p>` +
         c.sections.map((s, i) => `
           <section class="note-sec" id="sec-${i}">
             <h2>${esc(s.title)}</h2>
             ${s.subs.map((sb, j) => `<div class="sub-block" id="sub-${i}-${j}"><h3>${esc(sb.title)}</h3>${sb.html}</div>`).join('')}
           </section>`).join('') +
-        `<div class="callout tip"><b>本章学完了？</b><a href="#/ch/${c.id}/quiz">去做第${c.id}章课后练习（${c.quiz.length} 题）→</a></div>`;
+        `<div class="callout tip"><b>本章学完了？</b><a href="#/ch/${c.id}/quiz">去做第${chNum(c)}章课后练习（${c.quiz.length} 题）→</a></div>`;
       enhance(content);
       if (typeof c.mount === 'function') c.mount(content);
       if (secIdx !== undefined && secIdx !== '') {
@@ -1755,7 +2022,7 @@ const CHAPTERS = [
   function renderQuiz(root, c, focusIdx) {
     const rec = (store.get()[c.id]) || {};
     root.innerHTML = `
-      <div class="quiz-head"><h1>第${c.id}章 · 课后练习</h1><div class="quiz-score" id="qscore"></div><button class="btn btn-sm btn-danger" id="qreset" type="button"><span class="ico ic-reset" aria-hidden="true"></span>重做本章</button></div>
+      <div class="quiz-head"><h1>${esc(getBook(c.book).title)} · 第${chNum(c)}章 课后练习</h1><div class="quiz-score" id="qscore"></div><button class="btn btn-sm btn-danger" id="qreset" type="button"><span class="ico ic-reset" aria-hidden="true"></span>重做本章</button></div>
       <div id="qcelebrate"></div>
       ${c.quiz.map((q, i) => `
         <div class="qcard" data-i="${i}" id="q-${i}">
@@ -1827,7 +2094,7 @@ const CHAPTERS = [
         ${shown.map(x => `<div class="list-row">${x.state === 'open' ? I.issue : x.state === 'done' ? I.done : I.bad}
           <div class="lr-main">
             <a class="lr-title" href="#/ch/${x.c.id}/quiz/${x.i}">${x.q.q}</a>
-            <div class="lr-meta">第${x.c.id}章 ${esc(x.c.title)} · ${x.q.type === 'fill' ? '填空' : '单选'} · 由 ${esc(x.c.author)} 编写</div>
+            <div class="lr-meta">${esc(getBook(x.c.book).title)} · 第${chNum(x.c)}章 ${esc(x.c.title)} · ${x.q.type === 'fill' ? '填空' : '单选'}</div>
           </div></div>`).join('') || '<div style="padding:24px;text-align:center" class="muted">暂无题目</div>'}
       </div>`;
     $$('.ftab', main).forEach(b => b.onclick = () => { quizFilter = b.dataset.f; renderQuizHub(); });
@@ -1864,7 +2131,7 @@ const CHAPTERS = [
           const icon = !t.answered ? I.idle : t.correct === t.total ? I.ok : t.answered < t.total ? I.pending : I.bad;
           return `<div class="list-row">${icon}
             <div class="lr-main">
-              <a class="lr-title" href="#/ch/${c.id}/quiz">第${c.id}章 ${esc(c.title)}</a>
+              <a class="lr-title" href="#/ch/${c.id}/quiz">${esc(getBook(c.book).title)} · 第${chNum(c)}章 ${esc(c.title)}</a>
               <div class="lr-meta">已答 ${t.answered}/${t.total} · 答对 ${t.correct} · 负责人 ${esc(c.author)}</div>
               <div class="progress" style="margin-top:6px;max-width:360px"><span style="width:${pct(t.correct, t.total)}%"></span></div>
               <details><summary>查看每题结果</summary><ul class="run-steps">
@@ -1930,7 +2197,7 @@ const CHAPTERS = [
     const res = index.filter(x => (x.title + x.text + x.c.title).toLowerCase().includes(ql)).slice(0, 8);
     searchSel = -1;
     searchPop.innerHTML = res.length ? res.map(x => `<a href="#/ch/${x.c.id}/${x.i}/${x.j}">
-      <div class="s-title">${esc(x.title)}</div><div class="s-snip muted">第${x.c.id}章 · ${esc(x.text.slice(0, 50))}…</div></a>`).join('')
+      <div class="s-title">${esc(x.title)}</div><div class="s-snip muted">${esc(getBook(x.c.book).title)} 第${chNum(x.c)}章 · ${esc(x.text.slice(0, 50))}…</div></a>`).join('')
       : `<div class="empty muted">没有找到「${esc(q)}」</div>`;
     searchPop.hidden = false;
   }
@@ -1951,11 +2218,13 @@ const CHAPTERS = [
   }
 
   searchInput.oninput = () => {
+    const keepY = window.scrollY;
     if (activeHighlight) {
       activeHighlight = '';
       clearGlobalHighlight();
     }
     doSearch();
+    if (window.scrollY !== keepY) window.scrollTo(0, keepY);
   };
   searchInput.onfocus = doSearch;
   searchInput.onkeydown = e => {
