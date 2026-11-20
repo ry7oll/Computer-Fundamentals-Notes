@@ -127,15 +127,13 @@
     [data-theme="dark"] .ic-logo,
     [data-theme="dark"] .ic-file { filter: invert(1); }
 
-    /* ---------- 页面主容器（侧边栏弹出时虚化暗淡） ---------- */
+    /* ---------- 页面主容器 ---------- */
     .page-wrap {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      transition: filter 0.25s ease, opacity 0.25s ease;
     }
     body.drawer-open .page-wrap {
-      filter: blur(3px) brightness(0.55);
       pointer-events: none;
       user-select: none;
     }
@@ -238,17 +236,18 @@
       background: rgba(110, 118, 129, 0.35); border-radius: 2em; color: var(--fg);
     }
 
-    /* ---------- 弹出式侧边导航抽屉（高亮对比 + 背景虚化） ---------- */
+    /* ---------- 弹出式侧边导航抽屉（圆角 + 清晰色彩遮罩，对齐 GitHub） ---------- */
     .backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(1, 4, 9, 0.55);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
+      background: rgba(1, 4, 9, 0.5);
       z-index: 90;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.25s ease;
+    }
+    [data-theme="light"] .backdrop {
+      background: rgba(140, 149, 159, 0.28);
     }
     body.drawer-open .backdrop { opacity: 1; pointer-events: auto; }
 
@@ -259,12 +258,17 @@
       max-width: 88vw;
       background: var(--bg-subtle);
       border-right: 1px solid var(--border);
+      border-radius: 0 12px 12px 0;
+      overflow: hidden;
       box-shadow: var(--shadow);
       z-index: 100;
       display: flex;
       flex-direction: column;
       transform: translateX(-100%);
       transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    [data-theme="light"] .drawer {
+      background: var(--bg);
     }
     body.drawer-open .drawer { transform: translateX(0); }
 
@@ -1209,6 +1213,7 @@ const CHAPTERS = [
   const drawerBody = document.getElementById('drawerBody');
   const STORE_KEY = 'cfn-logic-v1';
   const THEME_KEY = 'cfn-theme-v1';
+  const LAST_KEY = 'cfn-last-v1';
 
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
@@ -1217,6 +1222,11 @@ const CHAPTERS = [
   const store = {
     get() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; } },
     set(p) { try { localStorage.setItem(STORE_KEY, JSON.stringify(p)); } catch (e) {} }
+  };
+  const lastStudy = {
+    get() { try { return JSON.parse(localStorage.getItem(LAST_KEY)) || null; } catch (e) { return null; } },
+    set(v) { try { localStorage.setItem(LAST_KEY, JSON.stringify(v)); } catch (e) {} },
+    clear() { try { localStorage.removeItem(LAST_KEY); } catch (e) {} }
   };
   const member = name => TEAM.find(m => m.name === name) || { name, color: '#6e7781' };
   const avatar = (name, cls = '') => `<span class="avatar ${cls}" style="background:${member(name).color}">${esc(String(name).slice(0, 1).toUpperCase())}</span>`;
@@ -1345,9 +1355,37 @@ const CHAPTERS = [
   }
   document.addEventListener('click', () => $$('.term.show').forEach(x => x.classList.remove('show')));
 
+  function getStudyAction() {
+    const p = store.get(), s = allStats(), last = lastStudy.get();
+    if (s.total > 0 && s.correct === s.total) {
+      return { href: '#/actions', text: '✓ 已全部完成 · 查看进度' };
+    }
+    const pendingCh = CHAPTERS.find(c => { const st = chapterStats(c, p); return st.correct < st.total; }) || CHAPTERS[0];
+    if (last && last.chId) {
+      const lc = CHAPTERS.find(c => c.id === last.chId);
+      if (lc) {
+        const lst = chapterStats(lc, p);
+        if (lst.correct < lst.total) {
+          if (last.secIdx === 'quiz') {
+            return { href: `#/ch/${lc.id}/quiz`, text: `▶ 继续练习第${lc.id}章` };
+          }
+          if (last.secIdx !== undefined && last.secIdx !== '' && lc.sections[+last.secIdx]) {
+            const secNum = lc.sections[+last.secIdx].title.split(' ')[0];
+            return { href: last.hash || `#/ch/${lc.id}/${last.secIdx}`, text: `▶ 继续学习第${lc.id}章 ${secNum}` };
+          }
+          return { href: `#/ch/${lc.id}`, text: `▶ 继续学习第${lc.id}章` };
+        }
+      }
+    }
+    const pst = chapterStats(pendingCh, p);
+    const verb = pst.answered > 0 ? '继续学习' : '开始学习';
+    return { href: `#/ch/${pendingCh.id}`, text: `▶ ${verb}第${pendingCh.id}章` };
+  }
+
   /* ---------- 首页 ---------- */
   function renderHome() {
     const s = allStats();
+    const act = getStudyAction();
     const totalSubs = CHAPTERS.reduce((n, c) => n + c.sections.reduce((m, sec) => m + sec.subs.length, 0), 0);
     main.innerHTML = `
       <div class="home-grid">
@@ -1358,7 +1396,7 @@ const CHAPTERS = [
             <span class="stat">${I.file}<b>${totalSubs}</b> 个小节</span>
             <span class="stat">${I.issue}<b>${s.total}</b> 道练习</span>
             <span class="spacer"></span>
-            <a class="btn btn-primary" href="#/ch/1">▶ 开始学习第1章</a>
+            <a class="btn btn-primary" href="${act.href}">${esc(act.text)}</a>
           </div>
           <div class="box">
             <div class="box-header">${avatar('ry7oll')}<b>ry7oll</b><span class="muted">同步《数字逻辑 / 开关理论》全部章节目录</span><span class="spacer"></span><span class="muted">2026-11-18</span></div>
@@ -1407,6 +1445,7 @@ const CHAPTERS = [
   function renderChapter(id, secIdx, subIdx) {
     const c = CHAPTERS.find(x => x.id === id);
     if (!c) return renderHome();
+    lastStudy.set({ chId: c.id, secIdx, subIdx, hash: location.hash || `#/ch/${c.id}` });
     const mode = secIdx === 'quiz' ? 'quiz' : 'notes';
     const idx = CHAPTERS.indexOf(c);
     const prev = CHAPTERS[idx - 1], next = CHAPTERS[idx + 1];
@@ -1574,7 +1613,7 @@ const CHAPTERS = [
             <a class="btn btn-sm" href="#/ch/${c.id}/quiz">${t.answered ? '继续' : '开始'}</a></div>`;
         }).join('')}
       </div>`;
-    $('#resetAll').onclick = () => { if (confirm('确定清空全部答题记录？')) { store.set({}); route(); } };
+    $('#resetAll').onclick = () => { if (confirm('确定清空全部答题记录？')) { store.set({}); lastStudy.clear(); route(); } };
   }
 
   /* ---------- 搜索 ---------- */
